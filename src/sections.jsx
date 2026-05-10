@@ -2,11 +2,62 @@
 
 const { useState: useStateS, useEffect: useEffectS, useRef: useRefS, useMemo: useMemoS } = React;
 
-// ─── Hero (3 variants via tweak) ───────────────────────────────────────────
-function Hero({ variant = 'cinematic' }) {
+// ─── Hero (4 variants via tweak) ───────────────────────────────────────────
+function Hero({ variant = 'video' }) {
   if (variant === 'editorial-split') return <HeroEditorial />;
   if (variant === 'monogram-stack')  return <HeroMonogram />;
-  return <HeroCinematic />;
+  if (variant === 'cinematic')       return <HeroCinematic />;
+  return <HeroVideo />;
+}
+
+function HeroVideo() {
+  return (
+    <section className="relative min-h-[100vh] w-full overflow-hidden bg-graphite-900" data-screen-label="Hero · Video">
+      <video
+        src="https://cdn.poses4u.com/Scenes/12989671_1920_1080_60fps.webm"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        poster="https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&w=2400&q=85"
+        className="absolute inset-0 w-full h-full object-cover opacity-90"
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-graphite-900/55 via-graphite-900/30 to-graphite-900/85" />
+      <div className="absolute inset-0 bg-gradient-to-tr from-graphite-900/40 to-transparent" />
+
+      <div className="relative h-full min-h-[100vh] flex flex-col">
+        <div className="flex-1 flex items-center">
+          <div className="max-w-[1400px] mx-auto px-6 md:px-10 w-full pt-40 pb-10">
+            <div className="reveal">
+              <div className="eyebrow text-ochre mb-6">Est. 2014 · Dubai</div>
+              <h1 className="font-display text-porcelain leading-[0.95] tracking-[-0.01em]" style={{ fontSize: 'clamp(56px, 9vw, 144px)', fontWeight: 400 }}>
+                Dubai's<br/><em className="not-italic text-ochre font-display" style={{ fontStyle: 'italic', fontWeight: 300 }}>address book.</em>
+              </h1>
+              <p className="mt-8 max-w-xl text-porcelain/85 text-[17px] leading-relaxed">
+                A senior brokerage for the city's most considered addresses — hand-picked off the public market, walked by the people who'll sell them.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="pb-16 md:pb-20">
+          <div className="max-w-[1400px] mx-auto px-6 md:px-10">
+            <div className="reveal">
+              <SearchBar />
+            </div>
+            <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-x-10 gap-y-4 max-w-3xl">
+              {[['1,247', 'Active listings'], ['AED 2.4B', 'Sold YTD'], ['80+', 'Senior agents'], ['25+', 'Developer partners']].map(([n, l]) => (
+                <div key={l} className="text-porcelain/90">
+                  <div className="font-display text-[28px] num leading-none">{n}</div>
+                  <div className="eyebrow text-porcelain/65 mt-2" style={{ fontSize: 10 }}>{l}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 function HeroCinematic() {

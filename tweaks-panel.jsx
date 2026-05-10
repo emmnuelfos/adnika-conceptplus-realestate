@@ -184,7 +184,10 @@ function useTweaks(defaults) {
 // flips off in lockstep; the host echoes __deactivate_edit_mode back which
 // is what actually hides the panel.
 function TweaksPanel({ title = 'Tweaks', noDeckControls = false, children }) {
-  const [open, setOpen] = React.useState(false);
+  // Default-open when running outside Claude Design's host (e.g. GitHub Pages).
+  // Inside the host, __activate_edit_mode / __deactivate_edit_mode still control it.
+  const _hasHost = typeof window !== 'undefined' && window.parent !== window;
+  const [open, setOpen] = React.useState(!_hasHost);
   const dragRef = React.useRef(null);
   // Auto-inject a rail toggle when a <deck-stage> is on the page. The
   // toggle drives the deck's per-viewer _railVisible via window message;

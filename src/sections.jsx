@@ -21,10 +21,8 @@ function HeroVideo() {
         playsInline
         preload="auto"
         poster="https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&w=2400&q=85"
-        className="absolute inset-0 w-full h-full object-cover opacity-90"
+        className="absolute inset-0 w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-graphite-900/55 via-graphite-900/30 to-graphite-900/85" />
-      <div className="absolute inset-0 bg-gradient-to-tr from-graphite-900/40 to-transparent" />
 
       <div className="relative h-full min-h-[100vh] flex flex-col">
         <div className="flex-1 flex items-center">

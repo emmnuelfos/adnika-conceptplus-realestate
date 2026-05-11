@@ -1160,45 +1160,24 @@
 
 <script src="deck-stage.js"></script>
 
-<!-- Force the deck to FILL THE VIEWPORT instead of contain-fitting (which left side bars on
-     non-16:9 viewports). Cover scaling: max(vw/dw, vh/dh) so one dimension fills exactly and
-     the other overflows symmetrically (cropped). Centered. -->
+<!-- Auto-request true browser fullscreen on the first click or key press.
+     Default deck-stage contain-fitting + body bg-match handles the pre-fullscreen state;
+     once fullscreen kicks in (viewport = full monitor) the 16:9 slide fits perfectly. -->
 <script>
 (function() {
-  function applyCoverFit() {
-    const ds = document.querySelector('deck-stage');
-    if (!ds || !ds.shadowRoot || !ds._canvas) return setTimeout(applyCoverFit, 80);
-
-    const dw = ds.designWidth || 1920;
-    const dh = ds.designHeight || 1080;
-
-    ds._fit = function() {
-      const c = this._canvas;
-      if (!c) return;
-      const rw = (this._railWidth && this._railWidth()) || 0;
-      const vw = window.innerWidth - rw;
-      const vh = window.innerHeight;
-      const s = Math.max(vw / dw, vh / dh);  // COVER (was Math.min for contain)
-      c.style.position = 'absolute';
-      c.style.left = (rw + (vw - dw) / 2) + 'px';
-      c.style.top = ((vh - dh) / 2) + 'px';
-      c.style.transformOrigin = 'center center';
-      c.style.transform = 'scale(' + s + ')';
-      if (this._overlay) this._overlay.style.marginLeft = (rw / 2) + 'px';
-      if (this._tapzones) this._tapzones.style.left = rw + 'px';
-    };
-
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
-    ds._fit();
-
-    let raf;
-    window.addEventListener('resize', () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => ds._fit && ds._fit());
-    });
+  let attempted = false;
+  function goFullscreen() {
+    if (attempted) return;
+    attempted = true;
+    const el = document.documentElement;
+    const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+    if (req && !document.fullscreenElement) {
+      try { req.call(el).catch(() => {}); } catch (e) { /* ignore */ }
+    }
   }
-  applyCoverFit();
+  // Capture phase so we catch even clicks the deck-stage handles internally
+  window.addEventListener('click',   goFullscreen, { capture: true });
+  window.addEventListener('keydown', goFullscreen, { capture: true });
 })();
 </script>
 

@@ -34,7 +34,10 @@
     --line-dark: rgba(246, 244, 239, 0.18);
   }
 
-  html, body { background: #0e0c08; }
+  /* Body bg flips to match the active slide so the deck-stage's letterbox bars
+     (when viewport aspect ≠ 16:9) blend with the slide instead of showing black. */
+  html, body { background: #F6F4EF; transition: background-color 600ms ease; }
+  html.slide-dark, html.slide-dark body { background: #1B1812; }
   body {
     margin: 0;
     font-family: 'Macan Pan', -apple-system, system-ui, sans-serif;
@@ -166,12 +169,7 @@
     border: 1px solid var(--line);
     transform-origin: top left;
   }
-  .preview iframe {
-    border: 0;
-    width: 1440px;
-    background: var(--porcelain);
-    display: block;
-  }
+  /* .preview iframe rule consolidated up at top (line ~60) — width: 100% so it fills the scaled container instead of a fixed 1440px that left white space on slide 13 */
   .preview .shade {
     position: absolute; inset: 0;
     background: linear-gradient(180deg, transparent 70%, rgba(41,38,27,0.04));
@@ -1142,12 +1140,21 @@
     prevBtn.addEventListener('click', () => { if (typeof ds.goTo === 'function') ds.goTo(Math.max(0, (ds.index || 0) - 1)); });
     nextBtn.addEventListener('click', () => { const t = total(); if (typeof ds.goTo === 'function') ds.goTo(Math.min(t - 1, (ds.index || 0) + 1)); });
 
+    // Match body bg to the active slide so the letterbox bars blend in (no more black margins on light slides).
+    function syncBg(i) {
+      const slides = ds.querySelectorAll(':scope > section');
+      const slide = slides[i];
+      if (!slide) return;
+      document.documentElement.classList.toggle('slide-dark', slide.classList.contains('dark'));
+    }
+
     ds.addEventListener('slidechange', (e) => {
       const i = (e.detail && typeof e.detail.index === 'number') ? e.detail.index : (ds.index || 0);
       const t = (e.detail && e.detail.total) || total();
       update(i, t);
+      syncBg(i);
     });
-    setTimeout(() => update(ds.index || 0, total()), 60);
+    setTimeout(() => { update(ds.index || 0, total()); syncBg(ds.index || 0); }, 60);
   })();
 </script>
 

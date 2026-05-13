@@ -283,86 +283,240 @@ function ScheduleViewing({ open, onClose, listing, agents }) {
 }
 
 // ─── Payment Plan Visualizer ──────────────────────────────────────────────
+// FAM-style off-plan project detail — dark centered hero, 5-up gallery, project
+// highlights, three "project experts", three-card payment plan, available units,
+// register-interest form, sticky right rail with starting price.
 function PaymentPlanModal({ open, onClose }) {
   const project = window.CONCEPTPLUS_DATA.offPlan[0];
-  const milestones = [
-    { pct: 10, when: 'On booking',     date: 'Jun 2026' },
-    { pct: 15, when: 'Within 90 days', date: 'Sep 2026' },
-    { pct: 25, when: 'Construction 25%', date: 'Mar 2027' },
-    { pct: 25, when: 'Construction 75%', date: 'Sep 2027' },
-    { pct: 25, when: 'On handover',    date: 'Q4 2027' },
+  const agents  = window.CONCEPTPLUS_DATA.agents;
+  const gallery = [
+    project.image,
+    'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=900&q=80',
+    'https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?auto=format&fit=crop&w=900&q=80',
+    'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=80',
   ];
-  const total = 4_200_000;
+  const totalAed = 4_200_000;
+
   return (
-    <Overlay open={open} onClose={onClose} max="max-w-5xl">
-      <div className="grid md:grid-cols-[1fr_1.4fr]">
-        <div className="relative">
-          <img src={project.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-tr from-graphite-900/85 to-graphite-900/30" />
-          <div className="relative p-8 md:p-10 text-porcelain min-h-[480px] flex flex-col justify-end">
-            <div className="eyebrow text-ochre">{project.developer}</div>
-            <div className="font-display text-[36px] mt-3 leading-tight">{project.name}</div>
-            <div className="text-[13px] text-stone-200 mt-2">{project.completion} · {project.units} units</div>
-            <div className="hairline border-t border-stone/30 mt-6 pt-5">
-              <div className="eyebrow text-stone-200" style={{ fontSize: 10 }}>Selected unit</div>
-              <div className="font-display text-[26px] num mt-1">AED 4.20M</div>
-              <div className="text-[12px] text-stone-200">2 BR · 1,420 sqft · floor 14</div>
+    <Overlay open={open} onClose={onClose} max="max-w-[1320px]">
+      <div className="bg-porcelain-100">
+        <div className="grid lg:grid-cols-[1fr_360px]">
+
+          {/* ============ LEFT — content ============ */}
+          <div className="space-y-5">
+
+            {/* Dark centered hero with project title */}
+            <div className="bg-graphite-900 text-porcelain px-7 md:px-10 py-10 md:py-12 text-center">
+              <div className="text-[12px] text-stone-200 tracking-wide flex items-center justify-center gap-2">
+                <a className="hover:text-ochre cursor-pointer">{project.developer.split(' ')[0]}</a>
+                <span className="opacity-50">›</span>
+                <span>{project.name}</span>
+              </div>
+              <h2 className="mt-4 font-display leading-tight" style={{ fontSize: 42, fontWeight: 400 }}>
+                {project.name} <span className="text-stone-200 font-display" style={{ fontWeight: 300 }}>by {project.developer}</span>
+              </h2>
+              <div className="mt-2 text-[14px] text-stone-200">at MBR City, Dubai</div>
             </div>
-          </div>
-        </div>
-        <div className="p-8 md:p-10">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="eyebrow text-ochre">Payment plan · 60/40</div>
-              <h3 className="font-display text-graphite-900 mt-3" style={{ fontSize: 32, fontWeight: 400 }}>How you'll pay.</h3>
-            </div>
-            <button onClick={onClose} className="cursor-pointer text-graphite hover:text-ochre"><CloseIcon /></button>
-          </div>
-          {/* Timeline */}
-          <div className="mt-8">
-            <div className="relative h-[120px]">
-              <div className="absolute left-0 right-0 top-[68px] h-px bg-stone-200" />
-              <div className="absolute left-0 top-[68px] h-px bg-ochre" style={{ width: '5%' }} />
-              <div className="flex justify-between">
-                {milestones.map((m, i) => (
-                  <div key={i} className="text-center" style={{ width: `${100 / milestones.length}%` }}>
-                    <div className="font-display text-graphite-900 num text-[26px] leading-none">{m.pct}%</div>
-                    <div className="text-[11px] text-graphite mt-1">{(total * m.pct / 100 / 1_000_000).toFixed(2)}M</div>
-                    <div className="relative mt-3 mb-3">
-                      <div className={`mx-auto w-3 h-3 ${i === 0 ? 'bg-ochre' : 'bg-porcelain hairline border border-stone-200'} rotate-45`} />
+
+            {/* 5-up gallery */}
+            <div className="px-5 md:px-7">
+              <div className="grid grid-cols-2 md:grid-cols-4 grid-rows-2 gap-2 h-[460px] md:h-[500px]">
+                <div className="col-span-2 row-span-2 overflow-hidden bg-stone-200 cursor-pointer relative">
+                  <img src={gallery[0]} alt="" className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
+                </div>
+                {gallery.slice(1).map((src, i) => {
+                  const isLast = i === gallery.length - 2;
+                  return (
+                    <div key={i} className="overflow-hidden bg-stone-200 cursor-pointer relative">
+                      <img src={src} alt="" className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
+                      {isLast && (
+                        <div className="absolute inset-0 bg-graphite-900/60 grid place-items-center">
+                          <button className="bg-porcelain text-graphite-900 px-5 py-2.5 text-[11px] tracking-[0.22em] uppercase hover:bg-ochre hover:text-porcelain cursor-pointer">
+                            Show all 64 photos
+                          </button>
+                        </div>
+                      )}
                     </div>
-                    <div className="eyebrow text-graphite-900" style={{ fontSize: 9 }}>{m.when}</div>
-                    <div className="text-[10px] text-stone tracking-[0.18em] uppercase num mt-0.5">{m.date}</div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Project highlights — header */}
+            <div className="px-5 md:px-7">
+              <h3 className="font-display text-ochre leading-tight" style={{ fontSize: 28, fontWeight: 400 }}>{project.name} Highlights</h3>
+            </div>
+
+            {/* Highlights grid */}
+            <div className="px-5 md:px-7">
+              <div className="bg-porcelain hairline border border-stone-200 p-6 md:p-7">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <FactCard icon={<HomeOutlineIcon />}  k="Type"        v="Apartments · Penthouses" />
+                  <FactCard icon={<DeveloperIcon />}    k="Developer"   v={project.developer} />
+                  <FactCard icon={<HashIcon />}         k="Status"      v={project.status} />
+                  <FactCard icon={<TitleIcon />}        k="Title type"  v="Freehold" />
+                  <FactCard icon={<LifestyleIcon />}    k="Lifestyle"   v="Premium" />
+                  <FactCard icon={<CalendarIcon />}     k="Launch"      v="Q1 2026" />
+                  <FactCard icon={<CalendarIcon />}     k="Completion"  v={project.completion} />
+                  <FactCard icon={<HomeOutlineIcon />}  k="Total units" v={`${project.units} units`} />
+                  <FactCard icon={<ClockIcon />}        k="Starting"    v={`AED ${(project.from/1_000_000).toFixed(2)}M`} />
+                </div>
+              </div>
+            </div>
+
+            {/* Project Experts (3 agents) */}
+            <div className="px-5 md:px-7">
+              <h3 className="font-display text-graphite-900 leading-tight mb-5" style={{ fontSize: 26, fontWeight: 400 }}>{project.name} Experts</h3>
+              <div className="grid md:grid-cols-3 gap-4">
+                {agents.slice(0, 3).map((a) => (
+                  <div key={a.name} className="relative overflow-hidden hairline border border-stone-200 cursor-pointer group">
+                    <img src={a.img} alt={a.name} className="w-full aspect-[3/4] object-cover transition-transform duration-700 group-hover:scale-105" />
+                    <div className="absolute inset-x-0 bottom-0 p-4 pt-12 bg-gradient-to-t from-graphite-900/85 to-transparent text-porcelain">
+                      <div className="font-display text-[20px] leading-tight">{a.name}</div>
+                      <div className="text-[11px] text-porcelain/85 mt-1">Property Advisor</div>
+                    </div>
+                    <button className="absolute bottom-4 right-4 w-10 h-10 grid place-items-center rounded-full bg-[#25D366] text-white cursor-pointer hover:scale-110 transition">
+                      <WhatsappIcon className="w-4 h-4" />
+                    </button>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
-          {/* Unit table */}
-          <div className="mt-8 hairline border-t pt-6">
-            <div className="eyebrow text-graphite mb-4">Available unit types</div>
-            <div className="space-y-1 text-[13px]">
-              {[
-                ['Studio',     '480–540 sqft',   '1.80M', '14'],
-                ['1 Bedroom',  '720–890 sqft',   '2.40M', '38'],
-                ['2 Bedroom',  '1,180–1,540 sqft','3.95M', '22'],
-                ['3 Bedroom',  '1,820–2,260 sqft','6.20M', '8'],
-              ].map((r, i) => (
-                <div key={i} className={`grid grid-cols-[1.4fr_1.4fr_1fr_0.8fr_auto] items-center gap-4 py-3 hairline border-b border-stone-200 ${i === 2 ? 'bg-porcelain-100 -mx-4 px-4' : ''}`}>
-                  <div className="text-graphite-900">{r[0]}</div>
-                  <div className="text-graphite num">{r[1]}</div>
-                  <div className="text-graphite-900 num">AED {r[2]}</div>
-                  <div className="text-graphite num">{r[3]} left</div>
-                  <button className="text-[11px] tracking-[0.22em] uppercase text-ochre gold-underline cursor-pointer">View</button>
+
+            {/* Payment Plans — 3 horizontal cards */}
+            <div className="px-5 md:px-7">
+              <h3 className="font-display text-graphite-900 leading-tight mb-5" style={{ fontSize: 26, fontWeight: 400 }}>Payment plans</h3>
+              <div className="grid md:grid-cols-3 gap-4">
+                {[
+                  { pct: 10, label: 'First Installment', tone: 'bg-porcelain-100', icon: <PowerIcon /> },
+                  { pct: 50, label: 'Under Construction', tone: 'bg-stone/15',     icon: <CogIcon /> },
+                  { pct: 40, label: 'On Handover',        tone: 'bg-ochre/15',     icon: <KeyIcon /> },
+                ].map((p) => (
+                  <div key={p.label} className={`${p.tone} hairline border border-stone-200 p-7 relative min-h-[140px]`}>
+                    <div className="text-graphite-900 font-display num leading-none" style={{ fontSize: 56, fontWeight: 400 }}>{p.pct}%</div>
+                    <div className="mt-4 text-[13px] text-graphite-900">{p.label}</div>
+                    <div className="absolute top-6 right-6 text-graphite">{p.icon}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-3 text-[12px] text-graphite italic">
+                On a {`AED ${(totalAed/1_000_000).toFixed(2)}M`} unit: AED {(totalAed*0.10/1_000).toFixed(0)}K booking · AED {(totalAed*0.50/1_000_000).toFixed(2)}M during construction · AED {(totalAed*0.40/1_000_000).toFixed(2)}M on handover.
+              </div>
+            </div>
+
+            {/* Available unit types */}
+            <div className="px-5 md:px-7">
+              <h3 className="font-display text-graphite-900 leading-tight mb-5" style={{ fontSize: 26, fontWeight: 400 }}>Available unit types</h3>
+              <div className="bg-porcelain hairline border border-stone-200 overflow-hidden">
+                <div className="grid grid-cols-[1.4fr_1.4fr_1fr_0.8fr_auto] items-center gap-4 px-5 py-3 bg-porcelain-100 hairline border-b border-stone-200 text-[10px] tracking-[0.22em] uppercase text-graphite">
+                  <div>Type</div><div>Size</div><div>Price from</div><div>Available</div><div></div>
                 </div>
+                {[
+                  ['Studio',     '480–540 sqft',   '1.80M', '14'],
+                  ['1 Bedroom',  '720–890 sqft',   '2.40M', '38'],
+                  ['2 Bedroom',  '1,180–1,540 sqft','3.95M', '22'],
+                  ['3 Bedroom',  '1,820–2,260 sqft','6.20M', '8'],
+                ].map((r) => (
+                  <div key={r[0]} className="grid grid-cols-[1.4fr_1.4fr_1fr_0.8fr_auto] items-center gap-4 px-5 py-3.5 hairline border-b border-stone-200 last:border-b-0 hover:bg-porcelain-100 transition">
+                    <div className="text-graphite-900 text-[14px]">{r[0]}</div>
+                    <div className="text-graphite text-[13px] num">{r[1]}</div>
+                    <div className="text-graphite-900 text-[14px] num">AED {r[2]}</div>
+                    <div className="text-graphite text-[12px] num">{r[3]} left</div>
+                    <button className="text-[10px] tracking-[0.22em] uppercase text-ochre gold-underline cursor-pointer">View</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Register interest */}
+            <div className="px-5 md:px-7">
+              <div className="bg-porcelain hairline border border-stone-200 p-6 md:p-7">
+                <h3 className="font-display text-graphite-900 leading-tight" style={{ fontSize: 26, fontWeight: 400 }}>Register your interest</h3>
+                <p className="mt-2 text-[13px] text-graphite">A senior project specialist will be in touch within 24 hours with the full deck and a private viewing slot.</p>
+                <div className="mt-5 grid md:grid-cols-2 gap-3">
+                  <input type="text"  placeholder="Full name"   className="hairline border border-stone-200 px-4 py-3 text-[14px] bg-porcelain-100 outline-none focus:border-ochre" />
+                  <input type="email" placeholder="Email"       className="hairline border border-stone-200 px-4 py-3 text-[14px] bg-porcelain-100 outline-none focus:border-ochre" />
+                  <input type="tel"   placeholder="Phone"       className="hairline border border-stone-200 px-4 py-3 text-[14px] bg-porcelain-100 outline-none focus:border-ochre" />
+                  <select className="hairline border border-stone-200 px-4 py-3 text-[14px] bg-porcelain-100 outline-none focus:border-ochre">
+                    <option>Preferred unit type</option>
+                    <option>Studio</option><option>1 Bedroom</option><option>2 Bedroom</option><option>3 Bedroom</option>
+                  </select>
+                </div>
+                <textarea placeholder="Message (optional)" className="mt-3 w-full hairline border border-stone-200 p-4 text-[14px] bg-porcelain-100 outline-none focus:border-ochre resize-none min-h-[100px]" />
+                <button className="mt-5 w-full bg-ochre text-porcelain py-4 text-[11px] tracking-[0.22em] uppercase hover:bg-ochre-700 cursor-pointer">Register interest</button>
+              </div>
+            </div>
+
+            <div className="h-2" />
+          </div>
+
+          {/* ============ RIGHT — sticky rail ============ */}
+          <aside className="bg-porcelain hairline lg:border-l border-stone-200 p-6 md:p-7 lg:sticky lg:top-0 lg:self-start lg:max-h-screen lg:overflow-y-auto">
+            <button onClick={onClose} className="float-right cursor-pointer text-graphite hover:text-ochre"><CloseIcon /></button>
+
+            {/* Project hero strip */}
+            <div className="aspect-[5/3] overflow-hidden bg-stone-200">
+              <img src={project.image} alt={project.name} className="w-full h-full object-cover" />
+            </div>
+            <div className="mt-4">
+              <div className="eyebrow text-graphite" style={{ fontSize: 10 }}>{project.developer}</div>
+              <div className="font-display text-graphite-900 leading-tight mt-1" style={{ fontSize: 22, fontWeight: 400 }}>{project.name}</div>
+              <div className="text-[12px] text-graphite mt-1">{project.completion} · {project.status}</div>
+            </div>
+
+            {/* Starting price card */}
+            <div className="mt-5 hairline border border-stone-200 p-5">
+              <div className="eyebrow text-graphite" style={{ fontSize: 10 }}>Starting price</div>
+              <div className="font-display num text-graphite-900 mt-2 leading-none" style={{ fontSize: 36, fontWeight: 400 }}>
+                AED {(project.from/1_000_000).toFixed(2)}M
+              </div>
+              <div className="text-[11px] text-graphite mt-2">From {project.units} curated units</div>
+            </div>
+
+            {/* CTAs */}
+            <div className="mt-4 space-y-2.5">
+              <button className="w-full flex items-center justify-center gap-2 py-3.5 bg-ochre text-porcelain text-[12px] tracking-[0.22em] uppercase hover:bg-ochre-700 cursor-pointer">
+                Discover more <ArrowIcon className="w-3.5 h-3.5" />
+              </button>
+              <button className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#25D366] text-white text-[12px] tracking-[0.18em] uppercase hover:opacity-90 cursor-pointer">
+                <WhatsappIcon className="w-4 h-4" /> WhatsApp
+              </button>
+              <button className="w-full flex items-center justify-center gap-2 py-3.5 hairline border border-stone-200 text-graphite-900 text-[12px] tracking-[0.18em] uppercase hover:border-ochre hover:text-ochre cursor-pointer">
+                Download brochure
+              </button>
+            </div>
+
+            {/* Quick links */}
+            <div className="hairline border-t border-stone-200 my-6" />
+            <div className="eyebrow text-graphite mb-3" style={{ fontSize: 10 }}>Quick links</div>
+            <div className="space-y-2 text-[13px]">
+              {['Payment plan in full', 'Unit availability', 'Floor plans', 'Master plan & amenities', 'Investment outlook'].map((a) => (
+                <a key={a} className="block text-graphite-900 gold-underline cursor-pointer">{a}</a>
               ))}
             </div>
-          </div>
-          <button className="mt-8 w-full bg-ochre text-porcelain py-4 text-[11px] tracking-[0.22em] uppercase hover:bg-ochre-700 cursor-pointer">Register your interest</button>
+          </aside>
         </div>
       </div>
     </Overlay>
   );
+}
+
+// Icons specific to the off-plan project detail
+function TitleIcon({ className = 'w-4 h-4' }) {
+  return <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 5h16v4H4zM4 13h16v6H4z" /><path d="M8 9v4M16 9v4" /></svg>;
+}
+function LifestyleIcon({ className = 'w-4 h-4' }) {
+  return <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 13c2-6 6-9 9-9s7 3 9 9c-2 6-6 9-9 9s-7-3-9-9z" /><circle cx="12" cy="13" r="2.5" /></svg>;
+}
+function PowerIcon({ className = 'w-5 h-5' }) {
+  return <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 6a8 8 0 1 0 8 0" /><path d="M12 3v9" /></svg>;
+}
+function CogIcon({ className = 'w-5 h-5' }) {
+  return <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" /></svg>;
+}
+function KeyIcon({ className = 'w-5 h-5' }) {
+  return <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="15" r="4" /><path d="m21 2-9.6 9.6M15.5 7.5l3 3M19 5l2 2" /></svg>;
 }
 
 // ─── Stylized SVG Map (Buy listings preview) ──────────────────────────────

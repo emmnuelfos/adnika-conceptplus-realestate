@@ -201,32 +201,61 @@ function Communities() {
 // ─── Featured Listings ─────────────────────────────────────────────────────
 function FeaturedListings({ cardVariant, currency, areaUnit, shortlist, compare, onShortlist, onCompare, onOpen }) {
   const D = window.CONCEPTPLUS_DATA;
+  // FAM-style stacked list when default ('fam') variant is selected; old horizontal scroller for the alternate (editorial/minimal/agent-forward) variants.
+  const isFam = cardVariant === 'fam';
   const scrollRef = useRefS(null);
   const scrollBy = (dir) => scrollRef.current?.scrollBy({ left: dir * 460, behavior: 'smooth' });
+  const featured = isFam ? D.listings.slice(0, 4) : D.listings;
+
   return (
     <Section eyebrow="Featured listings" title="Currently on the books." sub="A sampling from this season's best — Frond M villas, Burj-view penthouses, Marina addresses you won't find on the public portals.">
-      <div className="-mt-2 mb-6 flex items-center gap-3 justify-end">
-        <button onClick={() => scrollBy(-1)} className="w-11 h-11 grid place-items-center hairline border border-stone-200 text-graphite hover:text-ochre hover:border-ochre transition cursor-pointer"><ArrowIcon dir="left" /></button>
-        <button onClick={() => scrollBy(1)} className="w-11 h-11 grid place-items-center hairline border border-stone-200 text-graphite hover:text-ochre hover:border-ochre transition cursor-pointer"><ArrowIcon /></button>
-      </div>
-      <div ref={scrollRef} className="flex gap-6 overflow-x-auto no-scrollbar -mx-6 md:-mx-10 px-6 md:px-10 snap-x">
-        {D.listings.map((l, i) => (
-          <div key={l.id} className="reveal w-[88vw] sm:w-[420px] md:w-[440px] shrink-0 snap-start" style={{ transitionDelay: `${i * 40}ms` }}>
-            <PropertyCard
-              listing={l}
-              agents={D.agents}
-              currency={currency}
-              areaUnit={areaUnit}
-              variant={cardVariant}
-              shortlistOn={shortlist.has(l.id)}
-              comparedOn={compare.has(l.id)}
-              onShortlist={() => onShortlist(l.id)}
-              onCompare={() => onCompare(l.id)}
-              onOpen={() => onOpen(l)}
-            />
-          </div>
-        ))}
-      </div>
+      {!isFam && (
+        <div className="-mt-2 mb-6 flex items-center gap-3 justify-end">
+          <button onClick={() => scrollBy(-1)} className="w-11 h-11 grid place-items-center hairline border border-stone-200 text-graphite hover:text-ochre hover:border-ochre transition cursor-pointer"><ArrowIcon dir="left" /></button>
+          <button onClick={() => scrollBy(1)} className="w-11 h-11 grid place-items-center hairline border border-stone-200 text-graphite hover:text-ochre hover:border-ochre transition cursor-pointer"><ArrowIcon /></button>
+        </div>
+      )}
+
+      {isFam ? (
+        <div className="flex flex-col gap-6">
+          {featured.map((l, i) => (
+            <div key={l.id} className="reveal" style={{ transitionDelay: `${i * 80}ms` }}>
+              <PropertyCard
+                listing={l}
+                agents={D.agents}
+                currency={currency}
+                areaUnit={areaUnit}
+                variant={cardVariant}
+                shortlistOn={shortlist.has(l.id)}
+                comparedOn={compare.has(l.id)}
+                onShortlist={() => onShortlist(l.id)}
+                onCompare={() => onCompare(l.id)}
+                onOpen={() => onOpen(l)}
+              />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div ref={scrollRef} className="flex gap-6 overflow-x-auto no-scrollbar -mx-6 md:-mx-10 px-6 md:px-10 snap-x">
+          {featured.map((l, i) => (
+            <div key={l.id} className="reveal w-[88vw] sm:w-[420px] md:w-[440px] shrink-0 snap-start" style={{ transitionDelay: `${i * 40}ms` }}>
+              <PropertyCard
+                listing={l}
+                agents={D.agents}
+                currency={currency}
+                areaUnit={areaUnit}
+                variant={cardVariant}
+                shortlistOn={shortlist.has(l.id)}
+                comparedOn={compare.has(l.id)}
+                onShortlist={() => onShortlist(l.id)}
+                onCompare={() => onCompare(l.id)}
+                onOpen={() => onOpen(l)}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="mt-12 flex justify-center">
         <a href="buy.html" className="eyebrow text-ochre gold-underline cursor-pointer">View all 1,247 listings</a>
       </div>

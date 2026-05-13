@@ -4,7 +4,7 @@ const { useState: useStateA, useEffect: useEffectA, useMemo: useMemoA } = React;
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "hero": "video",
-  "cardVariant": "editorial",
+  "cardVariant": "fam",
   "displayFont": "Cormorant Garamond",
   "showStripe": true
 }/*EDITMODE-END*/;
@@ -127,7 +127,7 @@ function App() {
         </TweakSection>
         <TweakSection title="Listing card">
           <TweakRadio label="Card style" value={tweaks.cardVariant} onChange={(v) => setTweak('cardVariant', v)}
-            options={[{ value: 'editorial', label: 'Editorial' }, { value: 'minimal', label: 'Minimal' }, { value: 'agent-forward', label: 'Agent' }]} />
+            options={[{ value: 'fam', label: 'FAM' }, { value: 'editorial', label: 'Editorial' }, { value: 'minimal', label: 'Minimal' }, { value: 'agent-forward', label: 'Agent' }]} />
         </TweakSection>
         <TweakSection title="Typography">
           <TweakSelect label="Display font" value={tweaks.displayFont} onChange={(v) => setTweak('displayFont', v)}

@@ -159,59 +159,151 @@ function ArrowIcon({ className = 'w-4 h-4', dir = 'right' }) {
 function CloseIcon({ className = 'w-5 h-5' }) {
   return <svg viewBox="0 0 24 24" className={className} {...Sx}><path d="M6 6l12 12M18 6L6 18" /></svg>;
 }
+function SearchIcon({ className = 'w-4 h-4' }) {
+  return <svg viewBox="0 0 24 24" className={className} {...Sx}><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></svg>;
+}
+function PillBtn({ children, title, onClick }) {
+  return (
+    <button
+      onClick={(e) => { e.stopPropagation(); onClick && onClick(e); }}
+      title={title}
+      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[10px] tracking-[0.18em] uppercase text-graphite hover:text-porcelain bg-porcelain hover:bg-ochre hairline border border-stone-200 hover:border-ochre transition cursor-pointer"
+    >
+      {children}
+    </button>
+  );
+}
 function PinIcon({ className = 'w-4 h-4' }) {
   return <svg viewBox="0 0 24 24" className={className} {...Sx}><path d="M12 22s7-7 7-12a7 7 0 0 0-14 0c0 5 7 12 7 12z" /><circle cx="12" cy="10" r="2.5" /></svg>;
 }
 
 // ─── Tabbed search bar (Buy / Rent / Off-Plan) ─────────────────────────────
+// FAM-style simplified hero search: pill tabs + single search field + button.
+// Heavy filtering (type / beds / price / status) lives on the listings page top bar.
 function SearchBar({ variant = 'overlay' }) {
   const [tab, setTab] = useState('Buy');
-  const [openChip, setOpenChip] = useState(null);
-  const [filters, setFilters] = useState({ location: 'Dubai', type: 'Any', beds: 'Any', price: 'Any' });
+  const [query, setQuery] = useState('');
   const isDark = variant === 'overlay';
-  const wrap = isDark
-    ? 'bg-porcelain/95 backdrop-blur border hairline border-stone-200 shadow-[0_30px_80px_-30px_rgba(0,0,0,.5)]'
-    : 'bg-porcelain border hairline border-stone-200';
+
   return (
-    <div className={`${wrap}`}>
-      {/* Tabs */}
-      <div className="flex items-end gap-8 px-6 md:px-8 pt-5">
-        {['Buy','Rent','Off-Plan'].map((t) => (
-          <button key={t} onClick={() => setTab(t)} className={`pb-3 text-[12px] tracking-[0.22em] uppercase font-medium cursor-pointer transition ${tab === t ? 'tab-active' : 'text-graphite hover:text-graphite-900'}`}>
+    <div className="flex flex-col items-center gap-4 w-full max-w-2xl mx-auto">
+      {/* Pill tabs */}
+      <div className={`inline-flex rounded-full p-1 ${isDark ? 'bg-graphite-900/55 backdrop-blur border hairline border-porcelain/20' : 'bg-porcelain border hairline border-stone-200'}`}>
+        {['Rent', 'Buy', 'Off-Plan'].map((t) => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            className={`px-7 py-2.5 rounded-full text-[12px] tracking-[0.22em] uppercase font-medium transition cursor-pointer ${
+              tab === t
+                ? 'bg-ochre text-porcelain'
+                : (isDark ? 'text-porcelain/85 hover:text-porcelain' : 'text-graphite hover:text-graphite-900')
+            }`}
+          >
             {t}
-            {tab === t && <span className="block h-[2px] w-full bg-ochre mt-2" />}
           </button>
         ))}
       </div>
-      <div className="hairline border-t" />
-      {/* Inputs */}
-      <div className="grid grid-cols-1 md:grid-cols-[1.6fr_1fr_0.8fr_1fr_auto] divide-y md:divide-y-0 md:divide-x hairline divide-stone-200">
-        <Field label="Location" hint="Community, building, or area" value={filters.location} />
-        <Field label="Property type" hint="Any" value={filters.type} />
-        <Field label="Beds" hint="Any" value={filters.beds} />
-        <Field label="Price" hint="Min – Max" value={filters.price} />
-        <a href={tab === 'Off-Plan' ? 'off-plan.html' : 'buy.html'} className="bg-ochre hover:bg-ochre-700 text-porcelain px-8 py-5 md:py-0 md:px-10 text-[12px] tracking-[0.22em] uppercase font-medium transition cursor-pointer flex items-center justify-center gap-3">
-          Search <ArrowIcon className="w-4 h-4" />
+
+      {/* Single search field + button */}
+      <div className="w-full flex items-stretch rounded-full overflow-hidden bg-porcelain hairline border border-stone-200 shadow-[0_20px_60px_-20px_rgba(0,0,0,.35)]">
+        <div className="flex-1 flex items-center gap-3 px-6 min-w-0">
+          <SearchIcon className="text-graphite w-5 h-5 flex-shrink-0" />
+          <input
+            type="text"
+            placeholder="Search by area, community, or project name"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="flex-1 py-4 text-[15px] text-graphite-900 placeholder-stone bg-transparent outline-none min-w-0"
+          />
+        </div>
+        <a
+          href={tab === 'Off-Plan' ? 'off-plan.html' : 'buy.html'}
+          className="bg-ochre hover:bg-ochre-700 text-porcelain px-8 md:px-12 flex items-center justify-center gap-3 text-[12px] tracking-[0.22em] uppercase font-medium cursor-pointer transition"
+        >
+          Search
         </a>
       </div>
     </div>
   );
 }
-function Field({ label, hint, value }) {
-  return (
-    <button className="text-left px-6 py-4 hover:bg-porcelain-100 transition cursor-pointer min-w-0">
-      <div className="eyebrow text-graphite mb-1.5" style={{ fontSize: 10 }}>{label}</div>
-      <div className="text-graphite-900 text-[14px] truncate">{value && value !== 'Any' ? value : <span className="text-stone">{hint}</span>}</div>
-    </button>
-  );
-}
 
-// ─── PropertyCard with 3 variants ──────────────────────────────────────────
-function PropertyCard({ listing, agents, currency, areaUnit, variant = 'editorial', shortlistOn, onShortlist, onCompare, comparedOn, onOpen }) {
+// ─── PropertyCard with 4 variants (FAM is the default) ────────────────────
+function PropertyCard({ listing, agents, currency, areaUnit, variant = 'fam', shortlistOn, onShortlist, onCompare, comparedOn, onOpen }) {
   const agent = agents[listing.agent];
   const hero = listing.images[0];
   const price = fmtPrice(listing.price, currency);
   const sqftDisplay = areaUnit === 'sqm' ? `${Math.round(listing.sqft * 0.0929)} sqm` : `${listing.sqft.toLocaleString()} sqft`;
+  const pricePerSqft = Math.round(listing.price / listing.sqft);
+
+  // FAM-style horizontal listing card — photo left, details right with bottom agent strip.
+  if (variant === 'fam') {
+    return (
+      <article
+        onClick={onOpen}
+        className="group cursor-pointer bg-porcelain hairline border border-stone-200 overflow-hidden hover:border-ochre transition-colors flex flex-col md:flex-row"
+      >
+        {/* Photo */}
+        <div className="relative md:w-[42%] md:flex-shrink-0 aspect-[4/3] md:aspect-auto md:min-h-[300px] overflow-hidden bg-stone-200">
+          <img src={hero} alt={listing.title} className="w-full h-full object-cover transition-transform duration-[900ms] group-hover:scale-[1.04]" loading="lazy" />
+          {listing.dld && (
+            <span className="absolute top-3 left-3 px-2 py-1 bg-ochre text-porcelain text-[10px] tracking-[0.22em] uppercase">DLD verified</span>
+          )}
+          <span className="absolute bottom-3 left-3 px-2 py-1 bg-graphite-900/75 text-porcelain text-[10px] tracking-[0.2em] uppercase flex items-center gap-1.5 backdrop-blur">
+            <CameraIcon className="w-3 h-3" /> {listing.photoCount}
+          </span>
+          <div className="absolute bottom-3 right-3 w-9 h-9 grid place-items-center bg-graphite-900/85 backdrop-blur">
+            <img src="assets/conceptplus-mono.svg" className="w-5 h-auto" alt="" />
+          </div>
+        </div>
+
+        {/* Details */}
+        <div className="flex-1 flex flex-col p-5 md:p-6 min-w-0">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-baseline gap-2 flex-wrap min-w-0">
+              <div className="font-display text-[26px] leading-none num text-graphite-900">{price}</div>
+              <span className="text-[11px] text-graphite num bg-porcelain-100 px-2.5 py-1 hairline border border-stone-200">
+                AED {pricePerSqft.toLocaleString()} <span className="opacity-70">/sqft</span>
+              </span>
+            </div>
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <ActionDot title="Save" onClick={(e) => { e.stopPropagation(); onShortlist && onShortlist(); }}>
+                <HeartIcon className="w-4 h-4" filled={shortlistOn} />
+              </ActionDot>
+              <ActionDot title="Share"><ShareIcon className="w-4 h-4" /></ActionDot>
+            </div>
+          </div>
+
+          <div className="mt-2 text-[15px] text-graphite-900 leading-snug">{listing.title}</div>
+
+          <div className="mt-3 flex items-center flex-wrap gap-x-5 gap-y-1 text-[12px] text-graphite num">
+            <span className="flex items-center gap-1.5"><AreaIcon /> {sqftDisplay}</span>
+            <span className="flex items-center gap-1.5"><BedIcon /> {listing.beds} Bed{listing.beds !== 1 ? 's' : ''}</span>
+            <span className="flex items-center gap-1.5"><BathIcon /> {listing.baths} Bath{listing.baths !== 1 ? 's' : ''}</span>
+          </div>
+
+          <div className="mt-3 text-[12px] text-graphite italic font-display">{listing.type} for Sale in {listing.subCommunity}</div>
+          <div className="text-[13px] text-graphite-900 mt-1 flex items-center gap-1.5">
+            <PinIcon className="w-3.5 h-3.5 text-ochre" /> {listing.subCommunity}, {listing.community}
+          </div>
+
+          {/* Agent strip — bottom, ochre-tinted */}
+          <div className="mt-auto pt-4 -mx-5 md:-mx-6 -mb-5 md:-mb-6 px-5 md:px-6 pb-5 md:pb-6 bg-ochre/[0.08] border-t hairline border-stone-200 flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-3 min-w-0">
+              <img src={agent.img} alt={agent.name} className="w-9 h-9 object-cover rounded-full hairline border border-stone-200" />
+              <div className="min-w-0">
+                <div className="text-[13px] text-graphite-900 truncate">{agent.name}</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              <PillBtn title="Call"><PhoneIcon className="w-3 h-3" /><span className="hidden sm:inline">Call</span></PillBtn>
+              <PillBtn title="WhatsApp"><WhatsappIcon className="w-3 h-3" /><span className="hidden sm:inline">WhatsApp</span></PillBtn>
+              <PillBtn title="Email"><EmailIcon className="w-3 h-3" /><span className="hidden sm:inline">Email</span></PillBtn>
+            </div>
+          </div>
+        </div>
+      </article>
+    );
+  }
 
   if (variant === 'minimal') {
     return (

@@ -112,7 +112,7 @@ function BuyPage() {
           <section className="bg-porcelain-100 border-b hairline border-stone-200 pt-10 pb-8">
             <div className="max-w-[1400px] mx-auto px-6 md:px-10">
               <div className="text-[11px] tracking-[0.22em] uppercase text-graphite/60 flex items-center gap-3">
-                <a href="index.html" className="gold-underline">Home</a>
+                <a href="home.html" className="gold-underline">Home</a>
                 <span>/</span>
                 <span className="text-graphite-900">Properties for sale in Dubai</span>
               </div>
@@ -294,7 +294,7 @@ function PropertyPage() {
         <main>
           {/* Breadcrumb */}
           <div className="max-w-[1400px] mx-auto px-6 md:px-10 pt-8 pb-4 text-[11px] tracking-[0.22em] uppercase text-graphite/60 flex items-center gap-3">
-            <a href="index.html" className="gold-underline">Home</a><span>/</span>
+            <a href="home.html" className="gold-underline">Home</a><span>/</span>
             <a href="buy.html" className="gold-underline">Buy</a><span>/</span>
             <a href="buy.html" className="gold-underline">{listing.community}</a><span>/</span>
             <span className="text-graphite-900">{listing.id}</span>
@@ -553,7 +553,7 @@ function OffPlanPage() {
             <div className="absolute inset-0 flex flex-col justify-end">
               <div className="max-w-[1400px] mx-auto w-full px-6 md:px-10 pb-16 text-porcelain">
                 <div className="text-[11px] tracking-[0.22em] uppercase text-porcelain/70 flex items-center gap-3">
-                  <a href="index.html" className="gold-underline">Home</a><span>/</span>
+                  <a href="home.html" className="gold-underline">Home</a><span>/</span>
                   <a href="buy.html" className="gold-underline">Off-Plan</a><span>/</span>
                   <span className="text-ochre">{project.developer}</span>
                 </div>

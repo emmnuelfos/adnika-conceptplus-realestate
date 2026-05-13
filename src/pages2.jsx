@@ -84,7 +84,7 @@ function SellPage() {
     <PC screenLabel="Sell · Valuation">
       {(ctx) => (
         <main>
-          <PageHead crumbs={[{label:'Home', href:'index.html'}, {label:'Sell your property'}]}
+          <PageHead crumbs={[{label:'Home', href:'home.html'}, {label:'Sell your property'}]}
             eyebrow="Instant valuation" title="What is your home worth, today?"
             sub="A live estimate, refined by a senior Concept Plus broker within 24 hours. Confidential, no obligation, no portal-style mass-emails." />
 
@@ -160,7 +160,7 @@ function DevelopersPage() {
     <PC screenLabel="Developers">
       {(ctx) => (
         <main>
-          <PageHead crumbs={[{label:'Home', href:'index.html'}, {label:'Developers'}]}
+          <PageHead crumbs={[{label:'Home', href:'home.html'}, {label:'Developers'}]}
             eyebrow="Our partners" title="The developers we represent."
             sub="Eight reference developers behind Dubai's most considered residential addresses. We hold direct allocation on launches and unit-level data on every active project." />
 
@@ -427,7 +427,7 @@ function ServicesPage() {
     <PC screenLabel="Services">
       {(ctx) => (
         <main>
-          <PageHead crumbs={[{label:'Home', href:'index.html'}, {label:'Services'}]}
+          <PageHead crumbs={[{label:'Home', href:'home.html'}, {label:'Services'}]}
             eyebrow="Full-service brokerage" title="Eight services, one address book."
             sub="Most boutique brokerages pick a niche. We chose to keep the full chain in-house — sales, leasing, off-plan, management, finance, conveyancing — so a single director can carry you end-to-end." />
 
@@ -483,7 +483,7 @@ function CareersPage() {
     <PC screenLabel="Careers">
       {(ctx) => (
         <main>
-          <PageHead crumbs={[{label:'Home', href:'index.html'}, {label:'Careers'}]}
+          <PageHead crumbs={[{label:'Home', href:'home.html'}, {label:'Careers'}]}
             eyebrow="Join Concept Plus" title="Senior people, on senior terms."
             sub="We hire experienced consultants who already command a following — and back them with the inventory, marketing and technology to compound it. Below: 10 open positions across the firm." />
 
@@ -612,7 +612,7 @@ function CommunityPage() {
               <div className="absolute inset-x-0 bottom-0 px-6 md:px-10 pt-24 pb-10">
                 <div className="max-w-[1400px] mx-auto">
                   <div className="text-[12px] text-porcelain/70 tracking-wide flex items-center gap-2">
-                    <a href="index.html" className="hover:text-ochre cursor-pointer">Home</a>
+                    <a href="home.html" className="hover:text-ochre cursor-pointer">Home</a>
                     <span className="opacity-50">›</span>
                     <a href="#" className="hover:text-ochre cursor-pointer">Dubai Real Estate Areas</a>
                     <span className="opacity-50">›</span>

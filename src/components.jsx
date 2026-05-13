@@ -63,7 +63,7 @@ function Header({ shortlistCount, onShortlist, onCompare, currency, setCurrency,
     <header className={`fixed top-0 inset-x-0 z-40 transition-colors duration-500 ${onPorcelain ? 'bg-porcelain/95 backdrop-blur border-b hairline border-stone' : 'bg-transparent'}`}>
       {/* Top utility strip (AED·USD·EUR | sqft·sqm | EN·AR | Sign in/up) removed per client request. */}
       <div className="flex items-center justify-between px-6 md:px-10 py-4">
-        <a href="index.html" className="cursor-pointer">
+        <a href="home.html" className="cursor-pointer">
           <Wordmark tone={onPorcelain ? 'dark' : 'light'} height={44} />
         </a>
         <nav className="hidden lg:flex items-center gap-8">

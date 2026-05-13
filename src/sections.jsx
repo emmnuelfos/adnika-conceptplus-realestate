@@ -14,49 +14,57 @@ function Hero({ variant = 'slider', onOpenListing, onOpenProject }) {
 // FAM-style featured-property slider — high-res luxury imagery, cross-fade,
 // auto-rotate, dot indicators. Each slide shows a Concept Plus property + CTA.
 function HeroSlider({ onOpenListing, onOpenProject }) {
-  // Hand-picked Unsplash images at 2880px / quality 95 — luxury Dubai real estate.
+  // Hero imagery — locally hosted, AI-rendered luxury Dubai realestate scenes.
   // Each slide is mapped to a real listing/project id so the CTA opens the
   // matching detail popup (instead of navigating away to /property.html etc.)
   const slides = [
     {
-      img: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=2880&q=95',
-      name: 'Frond M, Palm Jumeirah',
-      tagline: 'Signature Villas — beachfront living, redefined.',
-      eyebrow: 'For sale · Villa',
-      price: 'AED 42.5M',
-      listingId: 'L-2401',
+      img: 'assets/hero/01-overview.webp',
+      name: 'The Overview, MBR City',
+      tagline: 'Skybridge Residences — four towers, one private sky pool.',
+      eyebrow: 'Off-plan · Signature launch',
+      price: 'From AED 4.20M',
+      projectId: 'P-9001',
     },
     {
-      img: 'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?auto=format&fit=crop&w=2880&q=95',
+      img: 'assets/hero/02-burj-al-arab.webp',
+      name: 'Bulgari Marine Residences, Jumeirah Bay',
+      tagline: 'Sunset over the Burj Al Arab — private rooftop, private sea.',
+      eyebrow: 'For sale · Villa',
+      price: 'AED 35.4M',
+      listingId: 'L-2407',
+    },
+    {
+      img: 'assets/hero/03-downtown-night.webp',
       name: 'Burj-view Penthouse, Downtown',
-      tagline: 'The Burj framed in floor-to-ceiling glass.',
+      tagline: 'The Burj framed in floor-to-ceiling glass — fountain row.',
       eyebrow: 'For sale · Penthouse',
       price: 'AED 18.9M',
       listingId: 'L-2402',
     },
     {
-      img: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=2880&q=95',
-      name: 'Lakeside Mansion, Emirates Hills',
-      tagline: 'A private estate at Sector E, eight bedrooms.',
-      eyebrow: 'For sale · Mansion',
-      price: 'AED 78M',
-      listingId: 'L-2404',
+      img: 'assets/hero/04-twin-towers.webp',
+      name: 'Mirador Twin Towers, MBR City',
+      tagline: 'By Emaar · twin sculptural towers · Q2 2026 handover.',
+      eyebrow: 'Off-plan · Under construction',
+      price: 'From AED 2.95M',
+      projectId: 'P-9002',
     },
     {
-      img: 'https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&w=2880&q=95',
-      name: 'Cassia Residences, MBR City',
-      tagline: 'By Sobha · Handover Q4 2027 · 60/40 payment plan.',
+      img: 'assets/hero/05-supertall.webp',
+      name: 'Saadiyat Pavilion',
+      tagline: 'By Aldar · Saadiyat Island · Q3 2028 · sculpted crown.',
       eyebrow: 'Off-plan · Launched',
-      price: 'From AED 1.80M',
-      projectId: 'P-9001',
+      price: 'From AED 6.40M',
+      projectId: 'P-9004',
     },
     {
-      img: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=2880&q=95',
-      name: 'Sea-line apartment, Bluewaters',
-      tagline: 'Bluewaters Residences — sea-line orientation.',
-      eyebrow: 'For sale · Apartment',
-      price: 'AED 6.85M',
-      listingId: 'L-2403',
+      img: 'assets/hero/06-marina-balcony.webp',
+      name: 'Cayan Tower duplex, Dubai Marina',
+      tagline: 'Wrap-around terrace, Burj framed across the harbour.',
+      eyebrow: 'For sale · Penthouse',
+      price: 'AED 9.45M',
+      listingId: 'L-2405',
     },
   ];
 
@@ -118,9 +126,10 @@ function HeroSlider({ onOpenListing, onOpenProject }) {
         </div>
       ))}
 
-      {/* Subtle dark overlay so the white UI reads on bright slides */}
+      {/* Dark overlays so the transparent-white menu + bottom copy stay legible
+          on every slide, including bright sunset frames (slide 2). */}
       <div className="absolute inset-x-0 bottom-0 h-[80%] bg-gradient-to-t from-black/65 to-transparent pointer-events-none" />
-      <div className="absolute inset-x-0 top-0 h-[35%] bg-gradient-to-b from-black/30 to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 top-0 h-[40%] bg-gradient-to-b from-black/55 via-black/15 to-transparent pointer-events-none" />
 
       {/* Left arrow */}
       <button

@@ -16,9 +16,10 @@ function Hero({ variant = 'slider' }) {
 function HeroSlider() {
   // Hand-picked Unsplash images at 2880px / quality 95 — luxury Dubai real estate.
   // The slide content also gets surfaced as a small property card at the bottom-left.
+  // All photo IDs verified visually for Dubai luxury real estate appropriateness.
   const slides = [
     {
-      img: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=2880&q=95',
+      img: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=2880&q=95',
       name: 'Frond M, Palm Jumeirah',
       tagline: 'Signature Villas — beachfront living, redefined.',
       eyebrow: 'For sale · Villa',
@@ -34,7 +35,7 @@ function HeroSlider() {
       cta: 'property.html'
     },
     {
-      img: 'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=2880&q=95',
+      img: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=2880&q=95',
       name: 'Lakeside Mansion, Emirates Hills',
       tagline: 'A private estate at Sector E, eight bedrooms.',
       eyebrow: 'For sale · Mansion',
@@ -42,7 +43,7 @@ function HeroSlider() {
       cta: 'property.html'
     },
     {
-      img: 'https://images.unsplash.com/photo-1567496898669-ee935f5f647a?auto=format&fit=crop&w=2880&q=95',
+      img: 'https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&w=2880&q=95',
       name: 'Cassia Residences, MBR City',
       tagline: 'By Sobha · Handover Q4 2027 · 60/40 payment plan.',
       eyebrow: 'Off-plan · Launched',
@@ -50,7 +51,7 @@ function HeroSlider() {
       cta: 'off-plan.html'
     },
     {
-      img: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=2880&q=95',
+      img: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=2880&q=95',
       name: 'Sea-line apartment, Bluewaters',
       tagline: 'Bluewaters Residences — sea-line orientation.',
       eyebrow: 'For sale · Apartment',

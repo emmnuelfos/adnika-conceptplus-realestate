@@ -559,59 +559,77 @@ function MapPreview({ open, onClose, currency }) {
   );
 }
 
+// Real interactive Dubai map via Leaflet + Carto Positron tiles (no API key).
+// Custom ochre pulse-pins, synced with the side panel (hover/click).
 function StylizedMap({ listings, hoverId, onHover, currency }) {
-  // Custom SVG map of Dubai coastline & key communities — abstract, on-brand.
-  return (
-    <svg viewBox="0 0 100 80" className="w-full h-full" preserveAspectRatio="xMidYMid slice">
-      <defs>
-        <pattern id="hatch" width="2" height="2" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-          <line x1="0" y1="0" x2="0" y2="2" stroke="#D8D9D7" strokeWidth="0.4" />
-        </pattern>
-      </defs>
-      {/* Land base */}
-      <rect width="100" height="80" fill="#EAE8E3" />
-      {/* Sea */}
-      <path d="M0 0 L100 0 L100 18 Q70 28 50 22 Q30 16 0 26 Z" fill="#B2B4B2" opacity="0.35" />
-      <path d="M0 0 L100 0 L100 14 Q70 22 50 18 Q30 14 0 22 Z" fill="url(#hatch)" />
-      {/* Palm Jumeirah (abstract) */}
-      <g transform="translate(40, 22)">
-        <circle r="6" fill="#EAE8E3" stroke="#B2B4B2" strokeWidth="0.3" />
-        {[...Array(10)].map((_, i) => {
-          const a = (i / 10) * Math.PI * 2;
-          return <line key={i} x1={Math.cos(a) * 6} y1={Math.sin(a) * 6} x2={Math.cos(a) * 9} y2={Math.sin(a) * 9} stroke="#B2B4B2" strokeWidth="0.25" />;
-        })}
-        <circle r="3" fill="none" stroke="#AC7B43" strokeWidth="0.2" />
-        <text textAnchor="middle" y="-12" fill="#4D4B4A" fontSize="2" fontFamily="JetBrains Mono">PALM JUMEIRAH</text>
-      </g>
-      {/* Roads — sheikh zayed road as a long diagonal */}
-      <path d="M2 78 Q40 50 98 28" stroke="#B2B4B2" strokeWidth="0.4" fill="none" />
-      <path d="M2 78 Q40 50 98 28" stroke="#EAE8E3" strokeWidth="0.15" strokeDasharray="0.6 0.6" fill="none" />
-      <path d="M10 70 L90 40" stroke="#B2B4B2" strokeWidth="0.3" fill="none" />
-      <path d="M30 78 Q35 60 65 30" stroke="#B2B4B2" strokeWidth="0.3" fill="none" />
-      {/* Community labels */}
-      <text x="56" y="48" fill="#4D4B4A" fontSize="1.6" fontFamily="JetBrains Mono" textAnchor="middle">DOWNTOWN</text>
-      <text x="80" y="36" fill="#4D4B4A" fontSize="1.6" fontFamily="JetBrains Mono" textAnchor="middle">BUSINESS BAY</text>
-      <text x="35" y="68" fill="#4D4B4A" fontSize="1.6" fontFamily="JetBrains Mono" textAnchor="middle">JVC</text>
-      <text x="58" y="72" fill="#4D4B4A" fontSize="1.6" fontFamily="JetBrains Mono" textAnchor="middle">MBR CITY</text>
-      <text x="22" y="38" fill="#4D4B4A" fontSize="1.6" fontFamily="JetBrains Mono" textAnchor="middle">MARINA</text>
-      {/* Pins */}
-      {listings.map((l) => {
-        const isHover = hoverId === l.id;
-        return (
-          <g key={l.id} transform={`translate(${l.lat}, ${l.lng})`} onMouseEnter={() => onHover(l.id)} style={{ cursor: 'pointer' }}>
-            <circle r={isHover ? 2.2 : 1.4} fill={isHover ? '#1A1A1A' : '#AC7B43'} />
-            <circle r={isHover ? 4 : 2.4} fill="none" stroke={isHover ? '#1A1A1A' : '#AC7B43'} strokeWidth="0.2" opacity="0.4" />
-            {isHover && (
-              <g transform="translate(0, -5)">
-                <rect x="-12" y="-4.5" width="24" height="6" fill="#1A1A1A" />
-                <text textAnchor="middle" y="-0.2" fill="#EAE8E3" fontSize="1.8" fontFamily="JetBrains Mono">{fmtPrice(l.price, currency)}</text>
-              </g>
-            )}
-          </g>
-        );
-      })}
-    </svg>
-  );
+  const { useRef, useEffect } = React;
+  const containerRef = useRef(null);
+  const mapRef = useRef(null);
+  const markersRef = useRef(new Map());
+
+  // Mount once: create the map, tile layer, and one marker per listing.
+  useEffect(() => {
+    if (!containerRef.current || mapRef.current) return;
+    if (typeof L === 'undefined') return; // Leaflet not loaded yet — bail silently.
+
+    const map = L.map(containerRef.current, {
+      center: [25.12, 55.20],
+      zoom: 11,
+      zoomControl: true,
+      scrollWheelZoom: true,
+      attributionControl: true,
+    });
+    mapRef.current = map;
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '© OpenStreetMap · CartoDB',
+      maxZoom: 19,
+      subdomains: 'abcd',
+    }).addTo(map);
+
+    listings.forEach((l) => {
+      const icon = L.divIcon({
+        className: 'cp-pin-wrap',
+        html: `<div class="cp-pin" data-id="${l.id}"><div class="cp-pin-ring"></div><div class="cp-pin-dot"></div></div>`,
+        iconSize: [36, 36],
+        iconAnchor: [18, 18],
+      });
+      const m = L.marker([l.lat, l.lng], { icon }).addTo(map);
+      m.bindTooltip(fmtPrice(l.price, currency), { className: 'cp-tooltip', direction: 'top', offset: [0, -14], permanent: false });
+      m.on('mouseover', () => onHover(l.id));
+      m.on('click',     () => { onHover(l.id); map.flyTo([l.lat, l.lng], Math.max(map.getZoom(), 13), { duration: 0.6 }); });
+      markersRef.current.set(l.id, m);
+    });
+
+    // Fit all markers in view with padding
+    if (listings.length > 0) {
+      const bounds = L.latLngBounds(listings.map((l) => [l.lat, l.lng]));
+      map.fitBounds(bounds, { padding: [60, 60] });
+    }
+
+    // Invalidate size after the overlay's open animation finishes, so the map fills the container.
+    setTimeout(() => map.invalidateSize(), 250);
+
+    return () => { map.remove(); mapRef.current = null; markersRef.current.clear(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Highlight the active pin when hoverId changes.
+  useEffect(() => {
+    markersRef.current.forEach((m, id) => {
+      const el = m.getElement();
+      if (!el) return;
+      const pin = el.querySelector('.cp-pin');
+      if (pin) pin.classList.toggle('cp-active', id === hoverId);
+    });
+    // Smoothly pan to the active pin when hover comes from the side panel.
+    const active = markersRef.current.get(hoverId);
+    if (active && mapRef.current && !mapRef.current._gestureActive) {
+      mapRef.current.panTo(active.getLatLng(), { animate: true, duration: 0.45 });
+    }
+  }, [hoverId]);
+
+  return <div ref={containerRef} className="absolute inset-0" style={{ width: '100%', height: '100%' }} />;
 }
 
 // ─── Property Detail (light, compact — opened from card click) ────────────

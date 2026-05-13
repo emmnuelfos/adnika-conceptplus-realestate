@@ -461,77 +461,182 @@ function StylizedMap({ listings, hoverId, onHover, currency }) {
 }
 
 // ─── Property Detail (light, compact — opened from card click) ────────────
+// FAM-style property detail — 5-up gallery, title card, price card, 9-cell facts grid,
+// About section, inline mortgage calculator, amenities, and a sticky agent rail.
 function PropertyDetail({ open, onClose, listing, currency, onPhotos, onMortgage, onSchedule }) {
   if (!listing) return null;
   const agent = window.CONCEPTPLUS_DATA.agents[listing.agent];
+  const sqftDisplay = `${listing.sqft.toLocaleString()} sqft`;
+  const pricePerSqft = Math.round(listing.price / listing.sqft);
+
   return (
-    <Overlay open={open} onClose={onClose} max="max-w-[1200px]">
-      <div className="bg-porcelain">
-        <div className="grid lg:grid-cols-[1fr_380px]">
-          <div>
-            <div className="relative grid grid-cols-3 gap-1 p-1 bg-porcelain">
-              <div className="col-span-3 md:col-span-2 aspect-[16/10] overflow-hidden bg-stone-200 cursor-pointer relative" onClick={onPhotos}>
-                <img src={listing.images[0]} alt="" className="w-full h-full object-cover" />
-                <button className="absolute bottom-3 left-3 bg-porcelain/95 backdrop-blur px-3 py-2 text-[11px] tracking-[0.22em] uppercase">View all {listing.photoCount} photos</button>
+    <Overlay open={open} onClose={onClose} max="max-w-[1320px]">
+      <div className="bg-porcelain-100">
+        <div className="grid lg:grid-cols-[1fr_360px]">
+          {/* ============ LEFT — Main content ============ */}
+          <div className="p-5 md:p-7 space-y-5">
+
+            {/* Breadcrumbs */}
+            <div className="text-[12px] text-graphite tracking-wide flex items-center gap-2">
+              <a className="hover:text-ochre cursor-pointer">{listing.community}</a>
+              <span className="text-stone">›</span>
+              <a className="hover:text-ochre cursor-pointer">{listing.subCommunity}</a>
+              <span className="text-stone">›</span>
+              <span className="text-graphite-900">Ref {listing.id}</span>
+            </div>
+
+            {/* Title card */}
+            <div className="bg-porcelain hairline border border-stone-200 p-6 md:p-7">
+              <h2 className="font-display text-graphite-900 leading-tight" style={{ fontSize: 36, fontWeight: 400 }}>{listing.title}</h2>
+              <p className="mt-2 text-[14px] text-graphite">
+                {listing.beds} Beds {listing.type} for Sale in <a className="text-ochre hover:underline cursor-pointer">{listing.subCommunity}</a>, <a className="text-ochre hover:underline cursor-pointer">{listing.community}</a>, Dubai
+              </p>
+            </div>
+
+            {/* 5-up gallery: 1 large left + 2x2 right */}
+            <div className="grid grid-cols-2 md:grid-cols-4 grid-rows-2 gap-2 h-[480px] md:h-[520px]">
+              <div className="col-span-2 row-span-2 overflow-hidden bg-stone-200 cursor-pointer relative" onClick={onPhotos}>
+                <img src={listing.images[0]} alt="" className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
               </div>
-              <div className="hidden md:flex flex-col gap-1">
-                <div className="aspect-[16/10] overflow-hidden bg-stone-200">
-                  <img src={listing.images[1] || listing.images[0]} alt="" className="w-full h-full object-cover" />
+              {[1, 2, 3, 4].map((i) => {
+                const src = listing.images[i] || listing.images[0];
+                const isLast = i === 4;
+                return (
+                  <div key={i} className="overflow-hidden bg-stone-200 cursor-pointer relative" onClick={onPhotos}>
+                    <img src={src} alt="" className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
+                    {isLast && (
+                      <div className="absolute inset-0 bg-graphite-900/60 grid place-items-center text-porcelain">
+                        <button className="bg-porcelain text-graphite-900 px-5 py-2.5 text-[11px] tracking-[0.22em] uppercase hover:bg-ochre hover:text-porcelain cursor-pointer">
+                          Show all {listing.photoCount} photos
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Price card */}
+            <div className="bg-porcelain hairline border border-stone-200 p-6 md:p-7 flex items-start justify-between gap-4 flex-wrap">
+              <div>
+                <div className="font-display num text-ochre leading-none" style={{ fontSize: 44, fontWeight: 400 }}>
+                  {fmtPrice(listing.price, currency)}
                 </div>
-                <div className="aspect-[16/10] overflow-hidden bg-stone-200 relative">
-                  <img src={listing.images[2] || listing.images[0]} alt="" className="w-full h-full object-cover" />
+                <div className="mt-3 inline-flex items-center gap-2 px-3 py-2 hairline border border-stone-200 text-[12px] text-graphite-900 cursor-pointer hover:border-ochre">
+                  <PinIcon className="w-3.5 h-3.5 text-ochre" />
+                  AED {pricePerSqft.toLocaleString()} <span className="opacity-70">/sqft</span>
                 </div>
+              </div>
+              {listing.dld && (
+                <div className="px-3 py-2 bg-ochre/10 hairline border border-ochre text-[11px] tracking-[0.18em] uppercase text-ochre">
+                  DLD verified
+                </div>
+              )}
+            </div>
+
+            {/* 9-cell facts grid */}
+            <div className="bg-porcelain hairline border border-stone-200 p-6 md:p-7">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <FactCard icon={<HomeOutlineIcon />} k="Type"        v={listing.type} />
+                <FactCard icon={<AreaIcon />}        k="Size"        v={sqftDisplay} />
+                <FactCard icon={<BedIcon />}         k="Bedroom"     v={listing.beds} />
+                <FactCard icon={<BathIcon />}        k="Bath"        v={listing.baths} />
+                <FactCard icon={<DeveloperIcon />}   k="Developer"   v="Emaar" />
+                <FactCard icon={<EyeIcon />}         k="View"        v="Community" />
+                <FactCard icon={<HashIcon />}        k="Ref No."     v={listing.id} />
+                <FactCard icon={<CalendarIcon />}    k="Completion"  v="Ready" />
+                <FactCard icon={<ClockIcon />}       k="Listed"      v="Today" />
               </div>
             </div>
-            <div className="px-7 md:px-9 py-7">
-              <div className="eyebrow text-ochre">{listing.community} · For sale</div>
-              <h2 className="font-display text-graphite-900 mt-3 leading-tight" style={{ fontSize: 40, fontWeight: 400 }}>{listing.title}</h2>
-              <div className="font-display text-graphite-900 num mt-3" style={{ fontSize: 44, fontWeight: 300 }}>{fmtPrice(listing.price, currency)}</div>
-              <div className="mt-7 grid grid-cols-2 md:grid-cols-4 gap-y-5 gap-x-3 hairline border-y border-stone-200 py-6">
-                <Fact k="Beds" v={listing.beds} />
-                <Fact k="Baths" v={listing.baths} />
-                <Fact k="Built-up" v={`${listing.sqft.toLocaleString()} sqft`} />
-                <Fact k="Type" v={listing.type} />
-                <Fact k="Furnishing" v={listing.furnishing} />
-                <Fact k="Reference" v={listing.id} />
-                <Fact k="Permit no." v="71240-22184" />
-                <Fact k="DLD verified" v={listing.dld ? 'Yes' : '—'} accent={listing.dld} />
+
+            {/* About this property */}
+            <div className="bg-porcelain hairline border border-stone-200 p-6 md:p-7">
+              <h3 className="font-display text-graphite-900 leading-tight mb-3" style={{ fontSize: 26, fontWeight: 400 }}>About this property</h3>
+              <p className="text-[14px] text-graphite leading-relaxed">
+                Concept Plus presents a poised {listing.beds}-bedroom {listing.type.toLowerCase()} in {listing.subCommunity}, finished to a discerning standard with full sea-line orientation.
+              </p>
+              <p className="mt-3 text-[14px] text-graphite leading-relaxed">
+                Property highlights include:
+                <br/>· Premium finishes with custom-designed interiors
+                <br/>· Floor-to-ceiling windows with panoramic views
+                <br/>· Smart home automation throughout
+                <br/>· Private terrace with sunset orientation
+              </p>
+              <a className="mt-4 inline-flex items-center gap-2 text-[12px] text-ochre tracking-[0.18em] uppercase gold-underline cursor-pointer">
+                Show more
+              </a>
+            </div>
+
+            {/* Ask a question */}
+            <div className="bg-porcelain hairline border border-stone-200 p-6 md:p-7">
+              <h3 className="font-display text-graphite-900 leading-tight mb-4" style={{ fontSize: 26, fontWeight: 400 }}>Ask a question</h3>
+              <textarea
+                placeholder="Message"
+                className="w-full hairline border border-stone-200 p-4 text-[14px] bg-porcelain-100 outline-none focus:border-ochre min-h-[120px] resize-none"
+              />
+              <div className="mt-4 flex justify-end">
+                <button className="inline-flex items-center gap-2 px-6 py-3 bg-ochre text-porcelain text-[11px] tracking-[0.22em] uppercase hover:bg-ochre-700 cursor-pointer">
+                  Ask a question <ArrowIcon className="w-3.5 h-3.5" />
+                </button>
               </div>
-              <p className="mt-7 text-graphite leading-relaxed text-[15px]">A poised {listing.beds}-bedroom {listing.type.toLowerCase()} in {listing.subCommunity}, finished to a discerning standard with full sea-line orientation. The plan moves through three reception rooms, a chef-grade kitchen, and a primary suite that opens onto a private garden. Currently held by the original owner.</p>
-              <div className="mt-7">
-                <div className="eyebrow text-ochre mb-3">Amenities</div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-y-2 text-[14px] text-graphite-900">
-                  {['Private pool','Smart-home suite','Maid\'s quarters','Built-in wardrobes','Sea-line view','Burj Khalifa view','Built-up gym','Driver quarters','Cinema room'].map((a) => (
-                    <div key={a} className="gold-tick">{a}</div>
-                  ))}
-                </div>
+            </div>
+
+            {/* Inline mortgage calculator */}
+            <div className="bg-porcelain hairline border border-stone-200 p-6 md:p-7">
+              <h3 className="font-display text-graphite-900 leading-tight mb-5" style={{ fontSize: 26, fontWeight: 400 }}>Mortgage calculator</h3>
+              <InlineMortgageCalc price={listing.price} />
+              <div className="mt-5 flex justify-end">
+                <button onClick={onMortgage} className="text-[12px] text-graphite tracking-[0.18em] uppercase gold-underline cursor-pointer">
+                  Open full calculator
+                </button>
               </div>
-              <div className="mt-8 flex gap-3">
-                <button onClick={onMortgage} className="bg-graphite-900 text-porcelain px-5 py-3 text-[11px] tracking-[0.22em] uppercase hover:bg-ochre cursor-pointer">Mortgage calc</button>
-                <button onClick={onPhotos} className="hairline border border-stone-200 px-5 py-3 text-[11px] tracking-[0.22em] uppercase text-graphite-900 hover:border-ochre hover:text-ochre cursor-pointer">View gallery</button>
+            </div>
+
+            {/* Amenities */}
+            <div className="bg-porcelain hairline border border-stone-200 p-6 md:p-7">
+              <h3 className="font-display text-graphite-900 leading-tight mb-5" style={{ fontSize: 26, fontWeight: 400 }}>Amenities</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-y-2 gap-x-6 text-[14px] text-graphite-900">
+                {['Private pool','Smart-home suite',"Maid's quarters",'Built-in wardrobes','Sea-line view','Burj Khalifa view','Built-up gym','Driver quarters','Cinema room','Concierge service','Valet parking','Children\'s play area'].map((a) => (
+                  <div key={a} className="gold-tick">{a}</div>
+                ))}
               </div>
             </div>
           </div>
-          {/* Sticky right rail */}
-          <aside className="bg-porcelain-100 hairline border-l border-stone-200 p-7">
+
+          {/* ============ RIGHT — Sticky agent rail ============ */}
+          <aside className="bg-porcelain hairline lg:border-l border-stone-200 p-6 md:p-7 lg:sticky lg:top-0 lg:self-start lg:max-h-screen lg:overflow-y-auto">
             <button onClick={onClose} className="float-right cursor-pointer text-graphite hover:text-ochre"><CloseIcon /></button>
-            <div className="flex items-center gap-4">
-              <img src={agent.img} alt={agent.name} className="w-16 h-16 rounded-full object-cover" />
-              <div>
-                <div className="eyebrow text-ochre" style={{ fontSize: 10 }}>Listing broker</div>
-                <div className="font-display text-graphite-900 text-[22px] leading-tight mt-1">{agent.name}</div>
-                <div className="text-[11px] tracking-[0.18em] uppercase text-graphite num">RERA · {agent.rera}</div>
-              </div>
+
+            {/* Agent card */}
+            <div className="text-center pb-6 border-b hairline border-stone-200">
+              <img src={agent.img} alt={agent.name} className="w-20 h-20 rounded-full object-cover mx-auto" />
+              <div className="eyebrow text-graphite mt-4" style={{ fontSize: 10 }}>Contact</div>
+              <div className="font-display text-graphite-900 text-[22px] leading-tight mt-1">{agent.name}</div>
+              <div className="text-[11px] tracking-[0.18em] uppercase text-graphite num mt-1">RERA · {agent.rera}</div>
+              <div className="text-[11px] text-graphite mt-2">Speaks {agent.langs.join(' · ')}</div>
             </div>
-            <div className="mt-5 text-[12px] text-graphite">Speaks {agent.langs.join(' · ')}</div>
-            <div className="mt-6 grid grid-cols-3 gap-2">
-              <RailBtn icon={<PhoneIcon />} label="Call" />
-              <RailBtn icon={<WhatsappIcon />} label="WhatsApp" />
-              <RailBtn icon={<EmailIcon />} label="Email" />
+
+            {/* Primary CTAs — WhatsApp + Message (FAM style) */}
+            <div className="mt-5 space-y-2.5">
+              <button className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#25D366] text-white text-[12px] tracking-[0.18em] uppercase hover:opacity-90 cursor-pointer">
+                <WhatsappIcon className="w-4 h-4" /> WhatsApp
+              </button>
+              <button className="w-full flex items-center justify-center gap-2 py-3.5 bg-graphite-900 text-porcelain text-[12px] tracking-[0.18em] uppercase hover:bg-ochre cursor-pointer">
+                <EmailIcon className="w-4 h-4" /> Message
+              </button>
+              <button className="w-full flex items-center justify-center gap-2 py-3.5 hairline border border-stone-200 text-graphite-900 text-[12px] tracking-[0.18em] uppercase hover:border-ochre hover:text-ochre cursor-pointer">
+                <PhoneIcon className="w-4 h-4" /> Call
+              </button>
             </div>
-            <button onClick={onSchedule} className="mt-3 w-full bg-ochre text-porcelain py-4 text-[11px] tracking-[0.22em] uppercase hover:bg-ochre-700 cursor-pointer">Schedule a viewing</button>
-            <div className="hairline border-t border-stone-200 my-7" />
-            <div className="eyebrow text-graphite mb-3">Quick actions</div>
+
+            {/* Schedule a viewing */}
+            <button onClick={onSchedule} className="mt-5 w-full bg-ochre text-porcelain py-4 text-[11px] tracking-[0.22em] uppercase hover:bg-ochre-700 cursor-pointer">
+              Schedule a viewing
+            </button>
+
+            {/* Quick actions */}
+            <div className="hairline border-t border-stone-200 my-6" />
+            <div className="eyebrow text-graphite mb-3" style={{ fontSize: 10 }}>Quick actions</div>
             <div className="space-y-2 text-[13px]">
               {['Add to shortlist','Add to compare','Share via WhatsApp','Generate PDF brochure','Request floor plan'].map((a) => (
                 <a key={a} className="block text-graphite-900 gold-underline cursor-pointer">{a}</a>
@@ -544,13 +649,89 @@ function PropertyDetail({ open, onClose, listing, currency, onPhotos, onMortgage
   );
 }
 
-function Fact({ k, v, accent }) {
+function FactCard({ icon, k, v }) {
   return (
-    <div>
-      <div className="eyebrow text-stone" style={{ fontSize: 10 }}>{k}</div>
-      <div className={`mt-1.5 num text-[14px] ${accent ? 'text-ochre' : 'text-graphite-900'}`}>{v}</div>
+    <div className="hairline border border-stone-200 p-3.5 flex items-center gap-3 bg-porcelain-100/50">
+      <div className="w-9 h-9 grid place-items-center bg-porcelain hairline border border-stone-200 text-ochre flex-shrink-0">
+        {icon}
+      </div>
+      <div className="min-w-0">
+        <div className="eyebrow text-graphite" style={{ fontSize: 10 }}>{k}</div>
+        <div className="mt-0.5 num text-[14px] text-graphite-900 truncate">{v}</div>
+      </div>
     </div>
   );
+}
+
+// Inline mortgage calculator — minimalist version sized to fit inside the detail panel
+function InlineMortgageCalc({ price }) {
+  const { useState: useStateMc } = React;
+  const [down, setDown] = useStateMc(25);
+  const [years, setYears] = useStateMc(20);
+  const [rate, setRate] = useStateMc(4.0);
+
+  const loanAmount = price * (1 - down / 100);
+  const monthlyRate = rate / 100 / 12;
+  const totalPayments = years * 12;
+  const monthly = monthlyRate > 0
+    ? (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, totalPayments)) / (Math.pow(1 + monthlyRate, totalPayments) - 1)
+    : loanAmount / totalPayments;
+
+  return (
+    <div className="grid md:grid-cols-[1fr_220px] gap-6 items-center">
+      <div className="space-y-4">
+        <MCField label="Down payment" value={`${down}%`}>
+          <input type="range" min="5" max="50" step="5" value={down} onChange={(e) => setDown(+e.target.value)} className="w-full accent-ochre" />
+        </MCField>
+        <MCField label="Loan period" value={`${years} years`}>
+          <input type="range" min="5" max="30" step="1" value={years} onChange={(e) => setYears(+e.target.value)} className="w-full accent-ochre" />
+        </MCField>
+        <MCField label="Interest rate" value={`${rate.toFixed(2)}%`}>
+          <input type="range" min="2" max="8" step="0.25" value={rate} onChange={(e) => setRate(+e.target.value)} className="w-full accent-ochre" />
+        </MCField>
+      </div>
+      <div className="w-44 h-44 mx-auto rounded-full border-[3px] border-ochre/30 grid place-items-center text-center">
+        <div>
+          <div className="eyebrow text-graphite" style={{ fontSize: 9 }}>Estimated</div>
+          <div className="font-display num text-graphite-900 mt-1" style={{ fontSize: 22, fontWeight: 400 }}>
+            AED {Math.round(monthly).toLocaleString()}
+          </div>
+          <div className="text-[10px] text-graphite mt-1">per month</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+function MCField({ label, value, children }) {
+  return (
+    <div>
+      <div className="flex justify-between items-baseline text-[12px]">
+        <span className="eyebrow text-graphite" style={{ fontSize: 10 }}>{label}</span>
+        <span className="text-graphite-900 num">{value}</span>
+      </div>
+      <div className="mt-1.5">{children}</div>
+    </div>
+  );
+}
+
+// ── Tiny inline icons specific to the property facts grid ──────────────────
+function HomeOutlineIcon({ className = 'w-4 h-4' }) {
+  return <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12 12 4l9 8" /><path d="M5 11v9h14v-9" /></svg>;
+}
+function DeveloperIcon({ className = 'w-4 h-4' }) {
+  return <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18M5 21V8l4-3v16M13 21V11l5-3v13" /><path d="M8 11h0M16 13h0M16 17h0" /></svg>;
+}
+function EyeIcon({ className = 'w-4 h-4' }) {
+  return <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></svg>;
+}
+function HashIcon({ className = 'w-4 h-4' }) {
+  return <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18" /></svg>;
+}
+function CalendarIcon({ className = 'w-4 h-4' }) {
+  return <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="1" /><path d="M3 10h18M8 3v4M16 3v4" /></svg>;
+}
+function ClockIcon({ className = 'w-4 h-4' }) {
+  return <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>;
 }
 function RailBtn({ icon, label }) {
   return (

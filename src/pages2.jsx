@@ -646,10 +646,10 @@ function CommunityPage() {
           {/* Stats strip */}
           <section className="max-w-[1400px] mx-auto px-6 md:px-10 mt-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-stone-200 hairline border border-stone-200">
-              <Stat k="Active listings"     v={`${community.count}`} />
-              <Stat k="Starting from"       v={`AED ${(fromPrice/1_000_000).toFixed(2)}M`} />
-              <Stat k="Avg · AED / sqft"    v={`${avgPpsf.toLocaleString()}`} />
-              <Stat k="Sub-communities"     v={`${subCommunities.size || 6}`} />
+              <CommunityStat k="Active listings"     v={`${community.count}`} />
+              <CommunityStat k="Starting from"       v={`AED ${(fromPrice/1_000_000).toFixed(2)}M`} />
+              <CommunityStat k="Avg · AED / sqft"    v={`${avgPpsf.toLocaleString()}`} />
+              <CommunityStat k="Sub-communities"     v={`${subCommunities.size || 6}`} />
             </div>
           </section>
 
@@ -716,7 +716,7 @@ function CommunityPage() {
   );
 }
 
-function Stat({ k, v }) {
+function CommunityStat({ k, v }) {
   return (
     <div className="bg-porcelain px-6 py-6">
       <div className="eyebrow text-graphite" style={{ fontSize: 10 }}>{k}</div>

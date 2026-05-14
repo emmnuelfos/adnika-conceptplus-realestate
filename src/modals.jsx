@@ -291,10 +291,10 @@ function PaymentPlanModal({ open, onClose }) {
   const agents  = window.CONCEPTPLUS_DATA.agents;
   const gallery = [
     project.image,
-    'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
-    'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=900&q=80',
-    'https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?auto=format&fit=crop&w=900&q=80',
-    'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=80',
+    'assets/properties/09-offplan-tower-lobby.webp',
+    'assets/properties/09-offplan-tower-show-apartment.webp',
+    'assets/properties/09-offplan-tower-skybridge.webp',
+    'assets/properties/09-offplan-tower-exterior.webp',
   ];
   const totalAed = 4_200_000;
 

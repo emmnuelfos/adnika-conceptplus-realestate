@@ -306,7 +306,7 @@ function HeroVideo() {
         loop
         playsInline
         preload="auto"
-        poster="https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&w=2400&q=85"
+        poster="assets/properties/02-downtown-penthouse-terrace.webp"
         className="absolute inset-0 w-full h-full object-cover"
       />
       {/* Bottom 80% gradient overlay: black 60% at the bottom → transparent at the 80% mark */}
@@ -350,7 +350,7 @@ function HeroCinematic() {
   return (
     <section className="relative min-h-[100vh] w-full overflow-hidden bg-graphite-900" data-screen-label="Hero · Cinematic">
       <img
-        src="https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&w=2400&q=85"
+        src="assets/properties/02-downtown-penthouse-terrace.webp"
         alt="Dubai skyline at golden hour"
         className="absolute inset-0 w-full h-full object-cover opacity-90"
       />
@@ -411,7 +411,7 @@ function HeroEditorial() {
         </div>
         <div className="relative">
           <img
-            src="https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&w=1600&q=85"
+            src="assets/properties/01-frond-m-villa-exterior.webp"
             alt="Palm Jumeirah villa"
             className="absolute inset-0 w-full h-full object-cover"
           />
@@ -430,7 +430,7 @@ function HeroMonogram() {
   return (
     <section className="relative min-h-[100vh] w-full bg-graphite-900 overflow-hidden" data-screen-label="Hero · Monogram stack">
       <img
-        src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=2400&q=85"
+        src="assets/properties/05-marina-duplex-terrace.webp"
         alt="Dubai Marina"
         className="absolute inset-0 w-full h-full object-cover opacity-50"
       />
@@ -734,7 +734,7 @@ function EditorialStrip({ onValuation }) {
           </div>
         </div>
         <div className="reveal aspect-[5/4] overflow-hidden bg-stone-200">
-          <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1600&q=85" alt="Emirates Hills villa" className="w-full h-full object-cover" />
+          <img src="assets/properties/10-lakeside-mansion-exterior.webp" alt="Emirates Hills villa" className="w-full h-full object-cover" />
         </div>
       </div>
     </section>
@@ -836,10 +836,10 @@ function MortgageSlider({ label, value, min, max, step, format, onChange }) {
 // ─── Testimonials carousel ────────────────────────────────────────────────
 function Testimonials() {
   const quotes = [
-    { quote: "Layla walked the Frond M villa with my wife and me three times before we offered. She knew the building's wind orientation, the next-door neighbours, the resale on the parallel frond. We bought through her in 11 days.", author: "Hassan A.", role: "Bought · Palm Jumeirah · AED 42.5M", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80" },
-    { quote: "We had Concept Plus run an off-market sale of our Bulgari villa. Three offers in a fortnight, all above asking, and a clean conveyance. Discretion mattered more than speed and they understood that from minute one.", author: "Reem K.", role: "Sold · Jumeirah Bay · AED 35.4M", img: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80" },
-    { quote: "I was buying my first Dubai apartment from London. They picked me up at the airport, drove me through five buildings the same afternoon, and had me pre-approved with three banks by the next morning. That is the level.", author: "Daniel M.", role: "Bought · Marina · AED 6.85M", img: "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?auto=format&fit=crop&w=600&q=80" },
-    { quote: "We held our Emirates Hills mansion privately for nine months — only Concept Plus had it on their books. They found the right family without it ever touching a portal. Exactly the brief.", author: "Amira F.", role: "Sold · Emirates Hills · AED 78M", img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=600&q=80" },
+    { quote: "Layla walked the Frond M villa with my wife and me three times before we offered. She knew the building's wind orientation, the next-door neighbours, the resale on the parallel frond. We bought through her in 11 days.", author: "Hassan A.", role: "Bought · Palm Jumeirah · AED 42.5M" },
+    { quote: "We had Concept Plus run an off-market sale of our Bulgari villa. Three offers in a fortnight, all above asking, and a clean conveyance. Discretion mattered more than speed and they understood that from minute one.", author: "Reem K.", role: "Sold · Jumeirah Bay · AED 35.4M" },
+    { quote: "I was buying my first Dubai apartment from London. They picked me up at the airport, drove me through five buildings the same afternoon, and had me pre-approved with three banks by the next morning. That is the level.", author: "Daniel M.", role: "Bought · Marina · AED 6.85M" },
+    { quote: "We held our Emirates Hills mansion privately for nine months — only Concept Plus had it on their books. They found the right family without it ever touching a portal. Exactly the brief.", author: "Amira F.", role: "Sold · Emirates Hills · AED 78M" },
   ];
   const [i, setI] = useStateS(0);
   useEffectS(() => {
@@ -873,7 +873,7 @@ function Testimonials() {
                     "{qq.quote}"
                   </p>
                   <div className="mt-8 flex items-center gap-4">
-                    <img src={qq.img} alt={qq.author} className="w-12 h-12 rounded-full object-cover" loading="lazy" />
+                    <div className="w-12 h-12 grid place-items-center rounded-full hairline border border-ochre text-ochre font-display num" style={{ fontWeight: 500 }}>{qq.author.charAt(0)}</div>
                     <div>
                       <div className="text-porcelain text-[14px] font-medium">{qq.author}</div>
                       <div className="text-porcelain/60 text-[11px] tracking-[0.18em] uppercase mt-1">{qq.role}</div>
@@ -940,14 +940,14 @@ function Awards() {
 function InstagramStrip() {
   // 8 editorial tiles — luxury Dubai property + interiors.
   const tiles = [
-    { img: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=600&q=80', cap: 'Frond M' },
-    { img: 'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?auto=format&fit=crop&w=600&q=80', cap: 'Burj penthouse' },
-    { img: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=600&q=80', cap: 'Emirates Hills' },
-    { img: 'https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&w=600&q=80', cap: 'Off-plan launch' },
-    { img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80', cap: 'Interior' },
-    { img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80', cap: 'Jumeirah Bay' },
-    { img: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80', cap: 'Bluewaters' },
-    { img: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80', cap: 'Cassia' },
+    { img: 'assets/properties/01-frond-m-villa-exterior.webp',    cap: 'Frond M' },
+    { img: 'assets/properties/02-downtown-penthouse-terrace.webp', cap: 'Burj penthouse' },
+    { img: 'assets/properties/04-emirates-hills-exterior.webp',   cap: 'Emirates Hills' },
+    { img: 'assets/properties/09-offplan-tower-exterior.webp',    cap: 'Off-plan launch' },
+    { img: 'assets/properties/02-downtown-penthouse-living.webp', cap: 'Interior' },
+    { img: 'assets/properties/07-bulgari-villa-exterior.webp',    cap: 'Jumeirah Bay' },
+    { img: 'assets/properties/03-bluewaters-apt-balcony.webp',    cap: 'Bluewaters' },
+    { img: 'assets/properties/09-offplan-tower-show-apartment.webp', cap: 'Cassia' },
   ];
   return (
     <section className="bg-porcelain-100 py-16 md:py-20" data-screen-label="Home · Instagram">

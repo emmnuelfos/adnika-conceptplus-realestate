@@ -17,7 +17,7 @@ function MortgagePage() {
           <section className="relative bg-graphite-900 text-porcelain" data-screen-label="Mortgage · Hero">
             <div className="absolute inset-0 overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?auto=format&fit=crop&w=2400&q=85"
+                src="assets/properties/02-downtown-penthouse-terrace.webp"
                 alt="Dubai skyline"
                 className="w-full h-full object-cover opacity-35"
                 loading="eager"

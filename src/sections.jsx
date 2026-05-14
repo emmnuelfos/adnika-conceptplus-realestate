@@ -2,6 +2,57 @@
 
 const { useState: useStateS, useEffect: useEffectS, useRef: useRefS, useMemo: useMemoS } = React;
 
+// Auto-play any horizontal carousel when it enters the viewport. Pauses on
+// hover and bails when out of view. Card-width-aware: advances by one card per
+// tick and wraps back to 0 at the end. Caller owns the scrollRef pointing at
+// the snap rail (the parent div with overflow-x-auto).
+function useAutoCarousel(scrollRef, intervalMs = 5000) {
+  useEffectS(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    let timer = null;
+    let hovered = false;
+    let visible = false;
+
+    const advance = () => {
+      if (!el || !el.children[0]) return;
+      const card = el.children[0];
+      const styles = window.getComputedStyle(el);
+      const gap = parseFloat(styles.columnGap || styles.gap || '0') || 0;
+      const step = card.offsetWidth + gap;
+      const max = el.scrollWidth - el.clientWidth;
+      if (el.scrollLeft >= max - step / 2) {
+        el.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        el.scrollBy({ left: step, behavior: 'smooth' });
+      }
+    };
+
+    const tick = () => { if (visible && !hovered) advance(); };
+    const start = () => { if (!timer) timer = setInterval(tick, intervalMs); };
+    const stop  = () => { if (timer) { clearInterval(timer); timer = null; } };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { visible = e.isIntersecting && e.intersectionRatio > 0.25; });
+    }, { threshold: [0, 0.25, 0.5] });
+    observer.observe(el);
+
+    const onEnter = () => { hovered = true; };
+    const onLeave = () => { hovered = false; };
+    el.addEventListener('mouseenter', onEnter);
+    el.addEventListener('mouseleave', onLeave);
+
+    start();
+
+    return () => {
+      observer.disconnect();
+      stop();
+      el.removeEventListener('mouseenter', onEnter);
+      el.removeEventListener('mouseleave', onLeave);
+    };
+  }, []);
+}
+
 // ─── Hero (5 variants via tweak) ───────────────────────────────────────────
 function Hero({ variant = 'slider', onOpenListing, onOpenProject }) {
   if (variant === 'editorial-split') return <HeroEditorial />;
@@ -151,17 +202,20 @@ function HeroSlider({ onOpenListing, onOpenProject }) {
       onTouchEnd={onPointerUp}
       style={{ perspective: 1400 }}
     >
-      {/* Slides — each absolute, cross-fading. Active slide image gets the
-          WebGL-feel mouse parallax (translate + 3D tilt) on hover. */}
+      {/* Slides — each absolute, cross-fading. Active slide gets a slow Ken Burns
+          zoom on the OUTER wrapper (so it composes cleanly with the inner image's
+          mouse parallax — they live on different elements and never fight). */}
       {slides.map((s, i) => (
-        <div key={i} className="absolute inset-0 transition-opacity duration-[1400ms]" style={{ opacity: i === idx ? 1 : 0 }}>
-          <img
-            src={s.img}
-            alt={s.name}
-            className={`absolute inset-0 w-full h-full object-cover transition-transform duration-[600ms] ease-out will-change-transform ${i === idx ? 'cp-hero-img-active' : ''}`}
-            loading={i === 0 ? 'eager' : 'lazy'}
-            draggable={false}
-          />
+        <div key={i} className="absolute inset-0 overflow-hidden transition-opacity duration-[1400ms]" style={{ opacity: i === idx ? 1 : 0 }}>
+          <div className={`absolute inset-0 ${i === idx ? 'cp-ken-burns' : ''}`}>
+            <img
+              src={s.img}
+              alt={s.name}
+              className={`absolute inset-0 w-full h-full object-cover transition-transform duration-[600ms] ease-out will-change-transform ${i === idx ? 'cp-hero-img-active' : ''}`}
+              loading={i === 0 ? 'eager' : 'lazy'}
+              draggable={false}
+            />
+          </div>
         </div>
       ))}
 
@@ -506,6 +560,7 @@ function Communities() {
   const slugify = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const scrollRef = useRefS(null);
   const scrollByCard = (dir) => scrollRef.current?.scrollBy({ left: dir * 380, behavior: 'smooth' });
+  useAutoCarousel(scrollRef, 5500);
   return (
     <Section eyebrow="Guides" title="Area Guides in Dubai" sub="Senior-broker-written guides to every freehold community we represent. Schools, cafés, walks, price trends, who's buying — all the context you need before a viewing.">
       {/* Carousel arrows top-right */}
@@ -545,6 +600,9 @@ function FeaturedListings({ cardVariant, currency, areaUnit, shortlist, compare,
   const isFam = cardVariant === 'fam';
   const scrollRef = useRefS(null);
   const scrollBy = (dir) => scrollRef.current?.scrollBy({ left: dir * 460, behavior: 'smooth' });
+  // Only the horizontal scroller variants auto-play; FAM stacked list is vertical
+  // and the hook's no-op early-out handles that even if it were attached.
+  useAutoCarousel(scrollRef, 6000);
   const featured = isFam ? D.listings.slice(0, 4) : D.listings;
 
   return (
@@ -608,6 +666,7 @@ function OffPlan({ onOpenPlan }) {
   const D = window.CONCEPTPLUS_DATA;
   const scrollRef = useRefS(null);
   const scrollByCard = (dir) => scrollRef.current?.scrollBy({ left: dir * 380, behavior: 'smooth' });
+  useAutoCarousel(scrollRef, 5500);
   return (
     <Section eyebrow="Off-plan" title="Latest Launched Projects in Dubai" sub="Pre-launch allocations from Dubai's most active developers — payment plans, handover quarters, and the data to know which towers will hold their value.">
       {/* Carousel arrows */}
@@ -1069,6 +1128,7 @@ function MostTrendingProjects({ onOpen }) {
   const featured = D.listings.slice(0, 4);
   const scrollRef = useRefS(null);
   const [activeIdx, setActiveIdx] = useStateS(0);
+  useAutoCarousel(scrollRef, 6000);
 
   const scrollByOne = (dir) => {
     const el = scrollRef.current;
@@ -1414,6 +1474,7 @@ function OurTeams() {
   const LANG_FULL = { EN: 'English', AR: 'Arabic', FR: 'French', ES: 'Spanish', DE: 'German', RU: 'Russian', TR: 'Turkish', UR: 'Urdu', IT: 'Italian', PT: 'Portuguese', JA: 'Japanese', ZH: 'Mandarin', HI: 'Hindi', FA: 'Farsi' };
   const scrollRef = useRefS(null);
   const scrollBy = (dir) => scrollRef.current?.scrollBy({ left: dir * 340, behavior: 'smooth' });
+  useAutoCarousel(scrollRef, 5500);
   return (
     <Section eyebrow="The team" title="Our teams" sub="Senior brokers, each representing a defined community. RERA-licensed, eight years minimum on the Dubai market — you speak to a director, not a call centre.">
       <div className="-mt-2 mb-6 flex items-center gap-3 justify-end">

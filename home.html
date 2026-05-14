@@ -74,6 +74,10 @@ tailwind.config = {
   /* Cinematic hover — every card image scales + boosts brightness/saturation/contrast on hover */
   .cinematic-img { transition: transform 1000ms cubic-bezier(0.2,0.7,0.2,1), filter 1000ms ease-out; will-change: transform, filter; }
   .group:hover .cinematic-img, .cinematic-img:hover { transform: scale(1.07); filter: brightness(1.07) saturate(1.14) contrast(1.04); }
+  /* Ken Burns slow zoom for the active hero slide. Runs ONLY on the wrapper
+     div so the inner image is free to host the parallax transforms. */
+  @keyframes cpKenBurns { 0% { transform: scale(1.00); } 100% { transform: scale(1.12); } }
+  .cp-ken-burns { animation: cpKenBurns 9000ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards; will-change: transform; transform-origin: center center; }
   /* Search input — no black outline / focus ring in any state */
   input.cp-search, input.cp-search:focus, input.cp-search:focus-visible, input.cp-search:hover { outline: none !important; box-shadow: none !important; border: none !important; -webkit-appearance: none !important; appearance: none !important; background: transparent !important; }
 

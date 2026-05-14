@@ -1160,26 +1160,9 @@
 
 <script src="deck-stage.js"></script>
 
-<!-- Auto-request true browser fullscreen on the first click or key press.
-     Default deck-stage contain-fitting + body bg-match handles the pre-fullscreen state;
-     once fullscreen kicks in (viewport = full monitor) the 16:9 slide fits perfectly. -->
-<script>
-(function() {
-  let attempted = false;
-  function goFullscreen() {
-    if (attempted) return;
-    attempted = true;
-    const el = document.documentElement;
-    const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
-    if (req && !document.fullscreenElement) {
-      try { req.call(el).catch(() => {}); } catch (e) { /* ignore */ }
-    }
-  }
-  // Capture phase so we catch even clicks the deck-stage handles internally
-  window.addEventListener('click',   goFullscreen, { capture: true });
-  window.addEventListener('keydown', goFullscreen, { capture: true });
-})();
-</script>
+<!-- (Auto-fullscreen on first click was removed — was triggering on Next button
+     and forcing the deck into native fullscreen, which interrupted the flow.
+     Presenters can still press F11 manually if they want the native fullscreen.) -->
 
 <style>
   /* Hover lift on reveal CTA */

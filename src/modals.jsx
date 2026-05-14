@@ -632,7 +632,9 @@ function StylizedMap({ listings, hoverId, onHover, currency }) {
     }
   }, [hoverId]);
 
-  return <div ref={containerRef} className="absolute inset-0" style={{ width: '100%', height: '100%' }} />;
+  // w-full h-full keeps the map sized to its parent without needing the parent to be position:relative.
+  // (Previously absolute inset-0 escaped to the viewport when a parent forgot 'relative'.)
+  return <div ref={containerRef} className="w-full h-full" />;
 }
 
 // ─── Property Detail (light, compact — opened from card click) ────────────

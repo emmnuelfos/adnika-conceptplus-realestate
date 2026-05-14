@@ -236,7 +236,7 @@ function DevelopersPage() {
             {E.developers.map(d => (
               <button key={d.name} onClick={() => setOpenId(d.name)} className="text-left bg-white hairline border border-stone-200 hover:border-ochre transition cursor-pointer overflow-hidden group">
                 <div className="aspect-[4/3] overflow-hidden bg-stone-200">
-                  <img src={d.img} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
+                  <img src={d.img} alt="" className="w-full h-full object-cover cinematic-img transition-transform duration-[1000ms] group-hover:scale-[1.07]" />
                 </div>
                 <div className="p-6">
                   <div className="font-display text-graphite-900" style={{ fontSize: '24px', fontWeight: 400 }}>{d.name}</div>

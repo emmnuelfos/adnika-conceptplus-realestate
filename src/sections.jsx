@@ -80,6 +80,29 @@ function HeroSlider({ onOpenListing, onOpenProject }) {
   const [idx, setIdx] = useStateS(0);
   const [paused, setPaused] = useStateS(false);
   const drag = useRefS({ startX: null, startY: null, moved: false });
+  const imgWrapRef = useRefS(null);
+
+  // WebGL-feel mouse parallax — translates + tilts the active slide image based
+  // on cursor position. Approximates the Adnika Motion plugin displacement
+  // without needing three.js; reads cinematic at full screen.
+  const onHeroMouseMove = (e) => {
+    const wrap = imgWrapRef.current;
+    if (!wrap) return;
+    const rect = wrap.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;   // -0.5..0.5
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    const active = wrap.querySelector('.cp-hero-img-active');
+    if (active) {
+      active.style.transform = `scale(1.06) translate3d(${x * -28}px, ${y * -28}px, 0) rotateX(${y * 1.2}deg) rotateY(${x * -1.2}deg)`;
+    }
+  };
+  const onHeroMouseLeave = () => {
+    const wrap = imgWrapRef.current;
+    if (!wrap) return;
+    const active = wrap.querySelector('.cp-hero-img-active');
+    if (active) active.style.transform = '';
+    setPaused(false);
+  };
 
   const next = () => setIdx((i) => (i + 1) % slides.length);
   const prev = () => setIdx((i) => (i - 1 + slides.length) % slides.length);
@@ -110,19 +133,29 @@ function HeroSlider({ onOpenListing, onOpenProject }) {
 
   return (
     <section
-      className="relative min-h-[100vh] w-full overflow-hidden bg-graphite-900 select-none"
+      ref={imgWrapRef}
+      className="relative min-h-[90vh] w-full overflow-hidden bg-graphite-900 select-none"
       data-screen-label="Hero · Slider"
       onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
+      onMouseLeave={onHeroMouseLeave}
+      onMouseMove={onHeroMouseMove}
       onMouseDown={onPointerDown}
       onMouseUp={onPointerUp}
       onTouchStart={onPointerDown}
       onTouchEnd={onPointerUp}
+      style={{ perspective: 1400 }}
     >
-      {/* Slides — each absolute, cross-fading */}
+      {/* Slides — each absolute, cross-fading. Active slide image gets the
+          WebGL-feel mouse parallax (translate + 3D tilt) on hover. */}
       {slides.map((s, i) => (
         <div key={i} className="absolute inset-0 transition-opacity duration-[1400ms]" style={{ opacity: i === idx ? 1 : 0 }}>
-          <img src={s.img} alt={s.name} className="absolute inset-0 w-full h-full object-cover" loading={i === 0 ? 'eager' : 'lazy'} draggable={false} />
+          <img
+            src={s.img}
+            alt={s.name}
+            className={`absolute inset-0 w-full h-full object-cover transition-transform duration-[600ms] ease-out will-change-transform ${i === idx ? 'cp-hero-img-active' : ''}`}
+            loading={i === 0 ? 'eager' : 'lazy'}
+            draggable={false}
+          />
         </div>
       ))}
 
@@ -479,7 +512,7 @@ function Communities() {
         {D.communities.map((c, i) => (
           <a key={c.name} href={`community.html?slug=${slugify(c.name)}`} className="reveal group cursor-pointer shrink-0 w-[78vw] sm:w-[44vw] md:w-[32vw] lg:w-[22vw] snap-start" style={{ transitionDelay: `${i * 30}ms` }}>
             <div className="relative aspect-[16/11] overflow-hidden bg-stone-200">
-              <img src={c.image} alt={c.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-[900ms] group-hover:scale-[1.06]" loading="lazy" />
+              <img src={c.image} alt={c.name} className="absolute inset-0 w-full h-full object-cover cinematic-img transition-transform duration-[1000ms] group-hover:scale-[1.07]" loading="lazy" />
               <div className="absolute inset-0 bg-gradient-to-t from-graphite-900/85 via-graphite-900/15 to-transparent" />
               <div className="absolute bottom-4 left-4 right-4 text-porcelain">
                 <div className="font-display text-[22px] leading-tight">{c.name}</div>
@@ -581,7 +614,7 @@ function OffPlan({ onOpenPlan }) {
         {D.offPlan.map((p, i) => (
           <article key={p.id} onClick={onOpenPlan} className="reveal group cursor-pointer bg-porcelain-100 hairline border border-stone-200 shrink-0 w-[80vw] sm:w-[46vw] md:w-[34vw] lg:w-[23vw] snap-start" style={{ transitionDelay: `${i * 60}ms` }}>
             <div className="relative aspect-[4/5] overflow-hidden">
-              <img src={p.image} alt={p.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-[900ms] group-hover:scale-[1.04]" loading="lazy" />
+              <img src={p.image} alt={p.name} className="absolute inset-0 w-full h-full object-cover cinematic-img transition-transform duration-[1000ms] group-hover:scale-[1.07]" loading="lazy" />
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-graphite-900/10 to-graphite-900/85" />
               <span className="absolute top-4 left-4 px-2.5 py-1 text-[10px] tracking-[0.22em] uppercase bg-porcelain/95 text-graphite-900">{p.status}</span>
               <div className="absolute bottom-5 left-5 right-5 text-porcelain">
@@ -673,7 +706,7 @@ function Insights() {
         {D.insights.map((a, i) => (
           <article key={a.title} className="reveal group cursor-pointer hairline border border-stone-200 bg-porcelain overflow-hidden flex flex-col" style={{ transitionDelay: `${i * 70}ms` }}>
             <div className="relative aspect-[4/3] overflow-hidden bg-stone-200">
-              <img src={a.image} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-[900ms] group-hover:scale-[1.05]" loading="lazy" />
+              <img src={a.image} alt="" className="absolute inset-0 w-full h-full object-cover cinematic-img transition-transform duration-[1000ms] group-hover:scale-[1.07]" loading="lazy" />
               <span className="absolute top-4 left-4 px-3 py-1.5 text-[10px] tracking-[0.22em] uppercase bg-porcelain/95 text-graphite-900 hairline border border-stone-200">{a.kind}</span>
             </div>
             <div className="p-6 flex-1 flex flex-col">
@@ -989,7 +1022,7 @@ function InstagramStrip() {
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2 md:gap-3">
           {tiles.map((t, i) => (
             <a key={i} href="#" className="relative aspect-square overflow-hidden group reveal" style={{ transitionDelay: `${i * 40}ms` }}>
-              <img src={t.img} alt={t.cap} className="w-full h-full object-cover transition-transform duration-[800ms] group-hover:scale-[1.08]" loading="lazy" />
+              <img src={t.img} alt={t.cap} className="w-full h-full object-cover cinematic-img transition-transform duration-[1000ms] group-hover:scale-[1.08]" loading="lazy" />
               <div className="absolute inset-0 bg-graphite-900/0 group-hover:bg-graphite-900/35 transition" />
               <div className="absolute inset-x-0 bottom-0 p-3 text-porcelain text-[10px] tracking-[0.22em] uppercase opacity-0 group-hover:opacity-100 transition">{t.cap}</div>
             </a>
@@ -1133,7 +1166,9 @@ function MostTrendingCard({ listing, index, isActive, onOpen }) {
   const imgRef = useRefS(null);
   const fmtPriceShort = (n) => 'AED ' + (n / 1_000_000).toFixed(n >= 10_000_000 ? 1 : 2).replace(/\.0+$/, '') + 'M';
 
-  // Parallax on hover — mouse position translates the image inside the frame.
+  // WebGL-feel parallax — mouse position drives image translate, 3D tilt, and
+  // a brightness/saturation pulse. Approximates the Adnika Motion plugin
+  // displacement effect without three.js. Card itself gets a subtle counter-tilt.
   const onMove = (e) => {
     const card = cardRef.current;
     const img = imgRef.current;
@@ -1141,9 +1176,12 @@ function MostTrendingCard({ listing, index, isActive, onOpen }) {
     const rect = card.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width - 0.5;
     const y = (e.clientY - rect.top) / rect.height - 0.5;
-    img.style.transform = `scale(1.06) translate3d(${x * -22}px, ${y * -22}px, 0)`;
+    img.style.transform = `scale(1.08) translate3d(${x * -28}px, ${y * -28}px, 0) rotateX(${y * 2}deg) rotateY(${x * -2}deg)`;
+    img.style.filter = `brightness(${1.04 + Math.abs(x) * 0.08}) saturate(${1.12 + Math.abs(y) * 0.08}) contrast(1.04)`;
   };
-  const onLeave = () => { if (imgRef.current) imgRef.current.style.transform = ''; };
+  const onLeave = () => {
+    if (imgRef.current) { imgRef.current.style.transform = ''; imgRef.current.style.filter = ''; }
+  };
 
   return (
     <article
@@ -1155,6 +1193,7 @@ function MostTrendingCard({ listing, index, isActive, onOpen }) {
       style={{
         opacity: isActive ? 1 : 0.5,
         transform: isActive ? 'scale(1)' : 'scale(0.96)',
+        perspective: 1200,
       }}
     >
       {/* Outer ochre glow for active card */}
@@ -1376,7 +1415,7 @@ function OurTeams() {
           return (
             <article key={a.name} className="reveal shrink-0 w-[320px] snap-start hairline border border-stone-200 bg-porcelain group" style={{ transitionDelay: `${i * 60}ms` }}>
               <div className="relative aspect-[4/5] overflow-hidden bg-stone-200">
-                <img src={a.img} alt={a.name} className="w-full h-full object-cover transition-transform duration-[800ms] group-hover:scale-[1.05]" loading="lazy" />
+                <img src={a.img} alt={a.name} className="w-full h-full object-cover cinematic-img transition-transform duration-[1000ms] group-hover:scale-[1.07]" loading="lazy" />
                 {i % 3 === 0 && (
                   <span className="absolute top-4 left-4 px-2.5 py-1 text-[9px] tracking-[0.22em] uppercase bg-ochre text-porcelain">Manager</span>
                 )}

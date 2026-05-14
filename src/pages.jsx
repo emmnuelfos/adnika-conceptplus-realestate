@@ -75,16 +75,22 @@ function BuyPage() {
   const [beds, setBeds] = useStateP('Any');
   const [priceMax, setPriceMax] = useStateP(80000000);
   const [sort, setSort] = useStateP('Featured');
-  const [view, setView] = useStateP('split'); // grid | split | map
+  const [view, setView] = useStateP('list'); // list | grid | map  (default: FAM-style vertical list)
   const [hoverId, setHoverId] = useStateP(null);
 
   // Build a richer listing pool by duplicating + tweaking the base 8 listings.
+  // Rotate the property image set per variant so every card shows a different
+  // cover shot (variant 'a' = exterior, 'b' = interior, 'c' = pool/detail).
+  // Each listing has a 4-shot SET — rotating prevents the visual repetition
+  // that happens when 24 cards all show the same hero image.
   const allListings = useMemoP(() => {
     const out = [];
     D.listings.forEach((l, i) => {
-      out.push(l);
-      out.push({ ...l, id: l.id + 'b', price: Math.round(l.price * 0.92), beds: Math.max(1, l.beds - 1), photoCount: l.photoCount + 4 });
-      out.push({ ...l, id: l.id + 'c', price: Math.round(l.price * 1.18), beds: l.beds + 1, sqft: l.sqft + 600, photoCount: l.photoCount + 8 });
+      const imgs = l.images || [];
+      const rotate = (arr, n) => arr.length ? [...arr.slice(n), ...arr.slice(0, n)] : arr;
+      out.push({ ...l, images: imgs });
+      out.push({ ...l, id: l.id + 'b', price: Math.round(l.price * 0.92), beds: Math.max(1, l.beds - 1), photoCount: l.photoCount + 4, images: rotate(imgs, 1) });
+      out.push({ ...l, id: l.id + 'c', price: Math.round(l.price * 1.18), beds: l.beds + 1, sqft: l.sqft + 600, photoCount: l.photoCount + 8, images: rotate(imgs, 2) });
     });
     return out;
   }, []);
@@ -162,7 +168,7 @@ function BuyPage() {
                   {['Featured', 'Newest', 'Price: low → high', 'Price: high → low', 'Largest'].map(s => <option key={s}>{s}</option>)}
                 </select>
                 <div className="flex hairline border border-stone-200 bg-white">
-                  {[['grid', 'Grid'], ['split', 'Split'], ['map', 'Map']].map(([v, l]) => (
+                  {[['list', 'List'], ['grid', 'Grid'], ['map', 'Map']].map(([v, l]) => (
                     <button key={v} onClick={() => setView(v)}
                       className={`px-4 py-2 text-[12px] tracking-[0.16em] uppercase cursor-pointer ${view === v ? 'bg-graphite-900 text-porcelain' : 'text-graphite hover:text-graphite-900'}`}>{l}</button>
                   ))}
@@ -171,31 +177,12 @@ function BuyPage() {
             </div>
           </section>
 
-          {/* Results body */}
+          {/* Results body — FAM-style: vertical card list as default, full-screen map as a separate view */}
           {view === 'map' ? (
-            <section className="h-[calc(100vh-220px)] bg-graphite-800">
+            <section className="h-[calc(100vh-200px)] bg-graphite-800">
               <StylizedMap listings={filtered.slice(0, 24)} hoverId={hoverId} onHover={setHoverId} currency={ctx.currency} />
             </section>
-          ) : view === 'split' ? (
-            <section className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-0">
-              <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 80px)' }}>
-                <div className="p-6 md:p-10 grid sm:grid-cols-2 gap-6">
-                  {filtered.map(l => (
-                    <div key={l.id} onMouseEnter={() => setHoverId(l.id)} onMouseLeave={() => setHoverId(null)}>
-                      <PropertyCard listing={l} agents={D.agents} currency={ctx.currency} areaUnit={ctx.areaUnit}
-                        variant="minimal"
-                        shortlistOn={ctx.shortlist.has(l.id)} comparedOn={ctx.compare.has(l.id)}
-                        onShortlist={() => ctx.onShortlist(l.id)} onCompare={() => ctx.onCompare(l.id)}
-                        onOpen={() => { window.location.href = `property.html?id=${l.id}`; }} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="hidden lg:block sticky top-[200px] bg-graphite-800" style={{ height: 'calc(100vh - 200px)' }}>
-                <StylizedMap listings={filtered.slice(0, 24)} hoverId={hoverId} onHover={setHoverId} currency={ctx.currency} />
-              </div>
-            </section>
-          ) : (
+          ) : view === 'grid' ? (
             <section className="max-w-[1400px] mx-auto px-6 md:px-10 py-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {filtered.map(l => (
                 <PropertyCard key={l.id} listing={l} agents={D.agents} currency={ctx.currency} areaUnit={ctx.areaUnit}
@@ -204,6 +191,43 @@ function BuyPage() {
                   onShortlist={() => ctx.onShortlist(l.id)} onCompare={() => ctx.onCompare(l.id)}
                   onOpen={() => { window.location.href = `property.html?id=${l.id}`; }} />
               ))}
+            </section>
+          ) : (
+            /* DEFAULT: vertical FAM-style list — one card per row, horizontal layout (photo left, details right) */
+            <section className="max-w-[1400px] mx-auto px-6 md:px-10 py-10 flex flex-col gap-6">
+              {filtered.map((l, i) => (
+                <div key={l.id} className="reveal" style={{ transitionDelay: `${Math.min(i, 8) * 40}ms` }}>
+                  <PropertyCard listing={l} agents={D.agents} currency={ctx.currency} areaUnit={ctx.areaUnit}
+                    variant="fam"
+                    shortlistOn={ctx.shortlist.has(l.id)} comparedOn={ctx.compare.has(l.id)}
+                    onShortlist={() => ctx.onShortlist(l.id)} onCompare={() => ctx.onCompare(l.id)}
+                    onOpen={() => { window.location.href = `property.html?id=${l.id}`; }} />
+                </div>
+              ))}
+            </section>
+          )}
+
+          {/* Always-visible Map preview section (FAM parity — Map shown as its own section
+              even on the list view, so the user doesn't have to leave the page) */}
+          {view !== 'map' && (
+            <section className="bg-graphite-900 text-porcelain border-t hairline border-stone-200" data-screen-label="Buy · Map preview">
+              <div className="max-w-[1400px] mx-auto px-6 md:px-10 pt-16 md:pt-20">
+                <div className="grid lg:grid-cols-[1fr_auto] items-end gap-6 mb-10">
+                  <div className="reveal">
+                    <div className="eyebrow text-ochre mb-4">Map view</div>
+                    <h2 className="font-display text-porcelain leading-[1.02]" style={{ fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 400, letterSpacing: '-0.02em' }}>
+                      {filtered.length.toLocaleString()} addresses, mapped to the meter.
+                    </h2>
+                    <p className="mt-5 text-porcelain/70 text-[15px] leading-relaxed max-w-2xl">Hover a pin to see the address. Click into the full map view for filters by community, price and bedrooms.</p>
+                  </div>
+                  <button onClick={() => setView('map')} className="hairline border border-porcelain/40 px-6 py-4 text-[11px] tracking-[0.22em] uppercase text-porcelain hover:border-ochre hover:text-ochre transition cursor-pointer inline-flex items-center gap-3 lg:justify-self-end">
+                    Open full map <ArrowIcon className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+              <div className="h-[500px] lg:h-[600px] bg-graphite-800">
+                <StylizedMap listings={filtered.slice(0, 24)} hoverId={hoverId} onHover={setHoverId} currency={ctx.currency} />
+              </div>
             </section>
           )}
 
@@ -371,7 +395,7 @@ function PropertyPage() {
                     const idx = i % listing.images.length;
                     return (
                       <button key={i} onClick={ctx.openPhotos} className="relative aspect-[4/3] overflow-hidden bg-graphite-800 cursor-pointer group hairline border border-porcelain/15">
-                        <img src={listing.images[idx]} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-[700ms] group-hover:scale-[1.08]" loading="lazy" />
+                        <img src={listing.images[idx]} alt="" className="absolute inset-0 w-full h-full object-cover cinematic-img transition-transform duration-[1000ms] group-hover:scale-[1.08]" loading="lazy" />
                         <div className="absolute inset-0 bg-graphite-900/0 group-hover:bg-graphite-900/25 transition" />
                         {i === 4 && (
                           <div className="absolute inset-0 bg-graphite-900/60 grid place-items-center text-porcelain">
@@ -893,7 +917,7 @@ function TrendingCommunities() {
           {list.map((c, i) => (
             <a key={c.name} href={`community.html?slug=${slug(c.name)}`} className="reveal group cursor-pointer" style={{ transitionDelay: `${i * 60}ms` }}>
               <div className="relative aspect-[4/5] overflow-hidden bg-stone-200">
-                <img src={c.image} alt={c.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-[800ms] group-hover:scale-[1.05]" loading="lazy" />
+                <img src={c.image} alt={c.name} className="absolute inset-0 w-full h-full object-cover cinematic-img transition-transform duration-[1000ms] group-hover:scale-[1.07]" loading="lazy" />
                 <div className="absolute inset-0 bg-gradient-to-t from-graphite-900/85 via-graphite-900/15 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-5 text-porcelain">
                   <div className="font-display text-[22px] leading-tight">{c.name}</div>
@@ -1372,7 +1396,7 @@ function RelatedCommunities({ exclude }) {
           {list.map((c, i) => (
             <a key={c.name} href={`community.html?slug=${slug(c.name)}`} className="reveal group cursor-pointer" style={{ transitionDelay: `${i * 60}ms` }}>
               <div className="relative aspect-[5/4] overflow-hidden bg-stone-200">
-                <img src={c.image} alt={c.name} className="w-full h-full object-cover transition-transform duration-[800ms] group-hover:scale-[1.05]" loading="lazy" />
+                <img src={c.image} alt={c.name} className="w-full h-full object-cover cinematic-img transition-transform duration-[1000ms] group-hover:scale-[1.07]" loading="lazy" />
                 <div className="absolute inset-0 bg-gradient-to-t from-graphite-900/80 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-5 text-porcelain">
                   <div className="font-display text-[22px] leading-tight">{c.name}</div>

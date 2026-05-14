@@ -213,7 +213,7 @@ function SearchBar({ variant = 'overlay' }) {
             placeholder="Search by area, community, or project name"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="flex-1 py-4 text-[15px] text-graphite-900 placeholder-stone bg-transparent outline-none min-w-0"
+            className="cp-search flex-1 py-4 text-[15px] text-graphite-900 placeholder-stone min-w-0"
           />
         </div>
         <a
@@ -244,7 +244,7 @@ function PropertyCard({ listing, agents, currency, areaUnit, variant = 'fam', sh
       >
         {/* Photo */}
         <div className="relative md:w-[42%] md:flex-shrink-0 aspect-[4/3] md:aspect-auto md:min-h-[300px] overflow-hidden bg-stone-200">
-          <img src={hero} alt={listing.title} className="w-full h-full object-cover transition-transform duration-[900ms] group-hover:scale-[1.04]" loading="lazy" />
+          <img src={hero} alt={listing.title} className="w-full h-full object-cover cinematic-img transition-transform duration-[1000ms] group-hover:scale-[1.07]" loading="lazy" />
           {listing.dld && (
             <span className="absolute top-3 left-3 px-2 py-1 bg-ochre text-porcelain text-[10px] tracking-[0.22em] uppercase">DLD verified</span>
           )}
@@ -309,7 +309,7 @@ function PropertyCard({ listing, agents, currency, areaUnit, variant = 'fam', sh
     return (
       <article className="group cursor-pointer" onClick={onOpen}>
         <div className="relative aspect-[4/3] overflow-hidden bg-stone-200">
-          <img src={hero} alt={listing.title} className="w-full h-full object-cover transition-transform duration-[900ms] group-hover:scale-[1.04]" loading="lazy" />
+          <img src={hero} alt={listing.title} className="w-full h-full object-cover cinematic-img transition-transform duration-[1000ms] group-hover:scale-[1.07]" loading="lazy" />
           <div className="absolute top-3 right-3 flex flex-col gap-2">
             <CardChip onClick={(e) => { e.stopPropagation(); onShortlist(); }} active={shortlistOn}><HeartIcon filled={shortlistOn} /></CardChip>
             <CardChip onClick={(e) => { e.stopPropagation(); onCompare(); }} active={comparedOn}><CompareIcon /></CardChip>
@@ -341,7 +341,7 @@ function PropertyCard({ listing, agents, currency, areaUnit, variant = 'fam', sh
     return (
       <article className="group cursor-pointer bg-porcelain-100 hairline border border-stone-200" onClick={onOpen}>
         <div className="relative aspect-[4/3] overflow-hidden">
-          <img src={hero} alt={listing.title} className="w-full h-full object-cover transition-transform duration-[900ms] group-hover:scale-[1.04]" loading="lazy" />
+          <img src={hero} alt={listing.title} className="w-full h-full object-cover cinematic-img transition-transform duration-[1000ms] group-hover:scale-[1.07]" loading="lazy" />
           <div className="absolute top-3 right-3 flex gap-2">
             <CardChip onClick={(e) => { e.stopPropagation(); onShortlist(); }} active={shortlistOn} solid><HeartIcon filled={shortlistOn} /></CardChip>
             <CardChip onClick={(e) => { e.stopPropagation(); onCompare(); }} active={comparedOn} solid><CompareIcon /></CardChip>
@@ -389,7 +389,7 @@ function PropertyCard({ listing, agents, currency, areaUnit, variant = 'fam', sh
   return (
     <article className="group cursor-pointer" onClick={onOpen}>
       <div className="relative aspect-[4/3] overflow-hidden bg-stone-200">
-        <img src={hero} alt={listing.title} className="w-full h-full object-cover transition-transform duration-[900ms] group-hover:scale-[1.04]" loading="lazy" />
+        <img src={hero} alt={listing.title} className="w-full h-full object-cover cinematic-img transition-transform duration-[1000ms] group-hover:scale-[1.07]" loading="lazy" />
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-graphite-900/55 to-transparent pointer-events-none" />
         <div className="absolute top-3 right-3 flex gap-2">
           <CardChip onClick={(e) => { e.stopPropagation(); onShortlist(); }} active={shortlistOn} solid><HeartIcon filled={shortlistOn} /></CardChip>

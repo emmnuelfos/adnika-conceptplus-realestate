@@ -54,6 +54,12 @@ tailwind.config = {
   .tab-active { color: #2E2D2C; }
   .tab-active::after { content: ''; display: block; height: 2px; width: 100%; background: #AC7B43; margin-top: 8px; }
   .ph-stripe { background-image: repeating-linear-gradient(45deg, #D8D9D7 0 6px, #EAE8E3 6px 12px); }
+  /* Cinematic hover — every card image scales + boosts brightness/saturation/contrast on hover */
+  .cinematic-img { transition: transform 1000ms cubic-bezier(0.2,0.7,0.2,1), filter 1000ms ease-out; will-change: transform, filter; }
+  .group:hover .cinematic-img, .cinematic-img:hover { transform: scale(1.07); filter: brightness(1.07) saturate(1.14) contrast(1.04); }
+  /* Search input — no black outline / focus ring in any state */
+  input.cp-search, input.cp-search:focus, input.cp-search:focus-visible, input.cp-search:hover { outline: none !important; box-shadow: none !important; border: none !important; -webkit-appearance: none !important; appearance: none !important; background: transparent !important; }
+
 
   /* Leaflet — ochre pin with pulse */
   .leaflet-container { background: #EAE8E3 !important; font-family: 'Macan Pan', system-ui, sans-serif !important; }
